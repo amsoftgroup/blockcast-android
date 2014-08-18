@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+  <array name="listArray">
+	<item>@string/THIRTY</item>
+	<item>@string/FORTYFIVE</item>
+	<item>@string/SIXTY</item>	
+  </array>
+  <string-array name="listValues">
+	<item>30000</item>
+	<item>45000</item>
+	<item>60000</item>  
+  </string-array>
+  <array name="measurementArray">
+    <item>@string/METRIC</item>
+	<item>@string/STANDARD</item>
+  </array>
+  <string-array name="measurementValues">
+    <item>@string/METRIC</item>
+	<item>@string/STANDARD</item>
+  </string-array>
+  <array name="formatArray">
+    <item>@string/TABLE</item>
+	<item>@string/TEXT</item>
+  </array>
+  <string-array name="formatValues">
+    <item>@string/TABLE</item>
+	<item>@string/TEXT</item>
+  </string-array>
+  <array name="delayArray">
+    <item>@string/SHOW</item>
+	<item>@string/HIDE</item>
+  </array>
+  
+  
+  <string-array name="delayValues">
+  	<item>1</item>
+    <item>0</item>
+  </string-array>
+    <array name="busArray">
+    <item>@string/SHOW_BUS</item>
+	<item>@string/HIDE_BUS</item>
+  </array>
+    <string-array name="busValues">
+  	<item>1</item>
+    <item>0</item>
+  </string-array>
+   
+  <string-array name="tripArray">
+    <item>@string/WALK</item>
+	<item>@string/DRIVE</item>
+	<item>@string/TRANSIT</item>
+    </string-array>
+  <string-array name="tripValues">
+    <item>@string/WALK</item>
+	<item>@string/DRIVE</item>
+	<item>@string/TRANSIT</item>
+  </string-array> 
+
+</resources>

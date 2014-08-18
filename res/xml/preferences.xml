@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+        <PreferenceCategory
+                android:title="Preferences...">
+                
+		<ListPreference
+			android:title="Refresh Delay"
+			android:summary="Duration between screen updates"
+			android:key="REFRESH_DELAY_MS"
+			android:entries="@array/listArray"
+			android:entryValues="@array/listValues" />
+			
+     	<ListPreference
+			android:title="System of Measurement"
+			android:summary="Metric or Standard"
+			android:key="MEASUREMENT_TYPE"
+			android:entries="@array/measurementArray"
+			android:entryValues="@array/measurementValues" />
+			
+		<ListPreference
+			android:title="Result Format"
+			android:summary="Tabular or Big Text"
+			android:key="RESULT_FORMAT"
+			android:entries="@array/formatArray"
+			android:entryValues="@array/formatValues" />
+
+		<ListPreference
+			android:title="Show System Wide Delays"
+			android:summary="May delay application startup by a few seconds"
+			android:key="SYSTEM_WIDE_DELAY"
+			android:entries="@array/delayArray"
+			android:entryValues="@array/delayValues" />
+			
+		<ListPreference
+			android:title="Voice Trip Planner"
+			android:summary="Default to walk, car, or mass transit"
+			android:key="TRIP_PLANNER"
+			android:entries="@array/tripArray"
+			android:entryValues="@array/tripValues" />
+			
+	<!--  	
+		<ListPreference
+			android:title="Show 'Bus Line' Option Button on Statup"
+			android:summary=""
+			android:key="BUS_BUTTON"
+			android:entries="@array/busArray"
+			android:entryValues="@array/busValues" />
+			-->	
+											               
+        </PreferenceCategory>
+
+</PreferenceScreen>

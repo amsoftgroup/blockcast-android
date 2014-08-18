@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    >
+<TextView  
+	android:id="@+id/hello"
+    android:layout_width="fill_parent" 
+    android:layout_height="wrap_content" 
+    android:text="@string/hello"
+    android:gravity="center_vertical"
+	android:textStyle="bold"
+	android:typeface="serif"
+/>
+    
+<ListView android:id="@id/android:list" 
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:paddingTop="20dp"
+    android:paddingBottom="50dp"
+  
+/>
+
+
+
+<!-- 
+<Button  
+	android:id="@+id/busbutton"
+    android:layout_width="200px" 
+    android:layout_height="wrap_content" 
+    android:gravity="center_vertical|center_horizontal"
+	android:textStyle="bold"
+	android:typeface="serif"
+	android:layout_above="@+id/delays"
+/>
+ -->
+<HorizontalScrollView 
+		android:id="@+id/hscroller"
+        android:layout_width="fill_parent" 
+        android:layout_height="50px"
+        android:layout_alignParentBottom="true">
+
+<TextView  
+ 	android:id="@+id/delays"
+    android:layout_width="fill_parent" 
+    android:layout_height="wrap_content" 
+    android:gravity="center_vertical"
+	android:textStyle="bold"
+	android:typeface="serif"
+	android:textColor="#ff0000"
+	android:textSize="20sp"
+	android:singleLine="true"
+	android:ellipsize="marquee"
+	android:marqueeRepeatLimit="marquee_forever"
+	android:layout_alignParentBottom="true"
+	android:focusable="true"
+
+	/>
+
+
+</HorizontalScrollView>
+	
+</RelativeLayout>
