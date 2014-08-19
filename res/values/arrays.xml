@@ -11,6 +11,38 @@
 	<item>45000</item>
 	<item>60000</item>  
   </string-array>
+  
+  <array name="distanceArray">
+	<item>@string/ONEHUNDRED</item>
+	<item>@string/TWOHUNDREDFIFTY</item>
+	<item>@string/FIVEHUNDRED</item>	
+  </array>
+  <string-array name="distanceValues">
+	<item>100</item>  
+	<item>250</item>  
+	<item>500</item> 
+  </string-array>
+  
+   <array name="durationArray">
+	<item>@string/FIFTEENMINUTES</item>  
+	<item>@string/THIRTYMINUTES</item>  
+	<item>@string/SIXTYMINUTES</item>   
+	<item>@string/THREEHOURS</item>   
+	<item>@string/SIXHOURS</item>   
+	<item>@string/TWELVEHOURS</item>   
+	<item>@string/ONEDAY</item>  
+  </array>
+
+  <string-array name="durationValues">
+	<item>900</item>  
+	<item>1800</item>  
+	<item>3600</item>   
+	<item>10800</item>   
+	<item>21600</item>   
+	<item>43200</item>   
+	<item>86400</item>   
+  </string-array> 
+  
   <array name="measurementArray">
     <item>@string/METRIC</item>
 	<item>@string/STANDARD</item>
@@ -19,42 +51,4 @@
     <item>@string/METRIC</item>
 	<item>@string/STANDARD</item>
   </string-array>
-  <array name="formatArray">
-    <item>@string/TABLE</item>
-	<item>@string/TEXT</item>
-  </array>
-  <string-array name="formatValues">
-    <item>@string/TABLE</item>
-	<item>@string/TEXT</item>
-  </string-array>
-  <array name="delayArray">
-    <item>@string/SHOW</item>
-	<item>@string/HIDE</item>
-  </array>
-  
-  
-  <string-array name="delayValues">
-  	<item>1</item>
-    <item>0</item>
-  </string-array>
-    <array name="busArray">
-    <item>@string/SHOW_BUS</item>
-	<item>@string/HIDE_BUS</item>
-  </array>
-    <string-array name="busValues">
-  	<item>1</item>
-    <item>0</item>
-  </string-array>
-   
-  <string-array name="tripArray">
-    <item>@string/WALK</item>
-	<item>@string/DRIVE</item>
-	<item>@string/TRANSIT</item>
-    </string-array>
-  <string-array name="tripValues">
-    <item>@string/WALK</item>
-	<item>@string/DRIVE</item>
-	<item>@string/TRANSIT</item>
-  </string-array> 
-
 </resources>

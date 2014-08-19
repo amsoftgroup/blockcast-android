@@ -4,12 +4,8 @@
     <string name="action_settings">Settings</string>
     <string name="view_posts">View Posts</string>
     <string name="hello_world">Hello world!</string>
-    <string name="hello">Washington D.C. Metro Schedules:</string>
-    <string name="GPS_closest">Closest Station</string>
-    <string name="GPS_closest_bus">Closest Bus</string>
     <string name="about">About</string>
     <string name="settings">Settings</string>
-    <string name="voice">voice</string>
     <string name="eula_title">End User License Agreement</string>
     <string name="eula_accept">Accept</string>
     <string name="eula_refuse">Don\'t Accept</string>
@@ -17,17 +13,23 @@
     <string name="THIRTY">30 seconds</string>
     <string name="FORTYFIVE">45 seconds</string>
     <string name="SIXTY">60 seconds</string>
+    
+
+    <string name="ONEHUNDRED">100</string>
+    <string name="TWOHUNDREDFIFTY">250</string>
+    <string name="FIVEHUNDRED">500</string>
+    	
+
+    <string name="FIFTEENMINUTES">15 minutes</string>
+    <string name="THIRTYMINUTES">30 minutes</string>
+    <string name="SIXTYMINUTES">60 minutes</string>
+    <string name="THREEHOURS">3 hours</string>
+    <string name="SIXHOURS">6 hours</string>
+    <string name="TWELVEHOURS">12 hours</string>
+    <string name="ONEDAY">1 Day</string> 
+	
     <string name="METRIC">Metric</string>
     <string name="STANDARD">Standard</string>
-    <string name="TABLE">Tabular</string>
-    <string name="TEXT">Text</string>
-    <string name="SHOW">Show system delays</string>
-    <string name="HIDE">Hide system delays</string>	
-    <string name="SHOW_BUS">Show Bus option on startup</string>
-    <string name="HIDE_BUS">Hide Bus option on startup</string>
-    <string name="WALK">Walk</string>
-    <string name="DRIVE">Drive</string>
-    <string name="TRANSIT">Mass Transit</string>
     <string name="REMOTE_STATUS_WEBSITE">[insert your webpage for remote status updates here]</string>
     <string name="WMATA_KEY">[insert your key here]</string>    
 

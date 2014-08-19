@@ -32,6 +32,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.sombrerosoft.blockcast.R;
+import com.sombrerosoft.blockcast.android.util.CallAPI;
 import com.sombrerosoft.blockcast.android.util.Utils;
 
 import org.osmdroid.DefaultResourceProxyImpl;
@@ -54,23 +55,19 @@ public class MainActivity extends Activity {
 	private MapView mapView;
 	//private ResourceProxyImpl resProxyImp = new ResourceProxyImpl(this);
 	private IMapController mapController;
-    private ResourceProxyImpl resProxyImp;
-    private ItemizedIconOverlay<OverlayItem> myLocationOverlay;
-	private MyLocationNewOverlay mMyLocationOverlay;
+	private ItemizedIconOverlay<OverlayItem> myLocationOverlay;
+	//private MyLocationNewOverlay mMyLocationOverlay;
 	//private GpsMyLocationProvider imlp = new GpsMyLocationProvider(this.getBaseContext());
-	
+
 	@SuppressLint("SimpleDateFormat")
 	private SimpleDateFormat df = new SimpleDateFormat(timeformat);  
-	//private final static String servername = "http://192.168.1.3:8080/blockcastweb";
-	private final static String servername = "http://www.blockcast.me";
+
 	private final String TAG = "MainActivity";
-	//private final static String servername = "localhost:8080/blockcastweb";
-	//private final String api = "/restapi/insertPost/{lon}/{lat}/{parent_id}";
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_main);
+		//setContentView(R.layout.activity_main);
 		//setContentView();
 		df.setTimeZone(TimeZone.getTimeZone("GMT"));  
 	}
@@ -88,7 +85,7 @@ public class MainActivity extends Activity {
 			String distance = params[5];
 			String time = params[6];
 			String duration = params[7];
-			
+
 			MultipartEntityBuilder builder = MultipartEntityBuilder.create();     
 			//builder.setBoundary("+++BOUNDARY+++");
 			builder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
@@ -99,17 +96,17 @@ public class MainActivity extends Activity {
 			builder.addTextBody("distance", distance);
 			builder.addTextBody("lon", lon);
 			builder.addTextBody("lat", lat);
-		
+
 			HttpPost httpPost = new HttpPost(target);
 			httpPost.setEntity(builder.build());
-			
+
 			Log.i(TAG, httpPost.getEntity().toString());
-			
+
 			Log.i(TAG, httpPost.getEntity().getContentType().getName() + "***" + httpPost.getEntity().getContentType().getValue());
-		
+
 			/*
 			String myString = null;
-			
+
 			try {
 				myString = IOUtils.toString(httpPost.getEntity().getContent());
 			} catch (IllegalStateException e1) {
@@ -117,10 +114,10 @@ public class MainActivity extends Activity {
 			} catch (IOException e1) {
 				Log.e(TAG, "IOException:" + e1.toString());
 			}
-			
+
 			Log.e(TAG, "myString:" + myString);
-			*/
-			
+			 */
+
 			java.io.ByteArrayOutputStream out = new java.io.ByteArrayOutputStream((int)httpPost.getEntity().getContentLength());
 			try {
 				httpPost.getEntity().writeTo(out);
@@ -130,12 +127,12 @@ public class MainActivity extends Activity {
 			byte[] entityContentAsBytes = out.toByteArray();
 			// or convert to string
 			String entityContentAsString = new String(out.toByteArray());
-			
+
 			Log.i(TAG, "entityContentAsString:" + entityContentAsString);
-			
+
 			AndroidHttpClient client = AndroidHttpClient.newInstance("Android");
 			HttpResponse response = null;
-			
+
 			try {
 				response = client.execute(httpPost);
 			} catch (IOException e) {
@@ -143,7 +140,7 @@ public class MainActivity extends Activity {
 			} finally {
 				client.close();
 			}
-			
+
 			return response;
 		}
 
@@ -159,26 +156,27 @@ public class MainActivity extends Activity {
 		super.onResume();
 		setContentView(R.layout.activity_viewposts);
 
-	     mapView = (MapView) findViewById(R.id.mapview);
-         mapView.setTileSource(TileSourceFactory.DEFAULT_TILE_SOURCE);
-         mapView.setBuiltInZoomControls(true);
-         mapView.setMultiTouchControls(true);
+		mapView = (MapView) findViewById(R.id.mapview);
 
-         mapController = mapView.getController();
-         mapController.setZoom(15);
-        
-         GeoPoint mapCenter = new GeoPoint(53554070, -2959520);
- GeoPoint overlayPoint = new GeoPoint(53554070 + 1000, -2959520 + 1000);
- mapController.setCenter(mapCenter);
+		mapView.setTileSource(TileSourceFactory.DEFAULT_TILE_SOURCE);
+		mapView.setBuiltInZoomControls(true);
+		mapView.setMultiTouchControls(true);
 
- ArrayList<OverlayItem> overlays = new ArrayList<OverlayItem>();
- overlays.add(new OverlayItem("New Overlay", "Overlay Description", overlayPoint));
+		mapController = mapView.getController();
+		mapController.setZoom(15);
 
- DefaultResourceProxyImpl resourceProxy = new DefaultResourceProxyImpl(this);
- this.myLocationOverlay = new ItemizedIconOverlay<OverlayItem>(overlays, null, resourceProxy);
- this.mapView.getOverlays().add(this.myLocationOverlay);
+		GeoPoint mapCenter = new GeoPoint(53554070, -2959520);
+		GeoPoint overlayPoint = new GeoPoint(53554070 + 1000, -2959520 + 1000);
+		mapController.setCenter(mapCenter);
 
- mapView.invalidate();
+		ArrayList<OverlayItem> overlays = new ArrayList<OverlayItem>();
+		overlays.add(new OverlayItem("New Overlay", "Overlay Description", overlayPoint));
+
+		DefaultResourceProxyImpl resourceProxy = new DefaultResourceProxyImpl(this);
+		this.myLocationOverlay = new ItemizedIconOverlay<OverlayItem>(overlays, null, resourceProxy);
+		this.mapView.getOverlays().add(this.myLocationOverlay);
+
+		mapView.invalidate();
 		final Button button = (Button) findViewById(R.id.button1);
 		//final TextView text = (TextView) findViewById(R.id.textView1);
 		final EditText text = (EditText) findViewById(R.id.editText1);
@@ -196,27 +194,27 @@ public class MainActivity extends Activity {
 				post.setDistance(100);
 				post.setPostTimestamp(new Date());
 				post.setDuration(3600);
-				
-				String reqstring = servername + "/restapi/insertPost/" ;
+
+				String reqstring = Utils.servername + Utils.api + "insertPost/" ;
 				/*
 				String reqstring = servername + "/restapi/insertPost/" + 
 						post.getLocation().getLon() + "/" + 
 						post.getLocation().getLat() + "/" + 
 						post.getParentId();
-				*/
+				 */
 
 				Log.i("MAINACTIVITY", "reqstring:" + reqstring);
-				
+
 				new NetworkTask().execute(reqstring, ""+post.getLocation().getLon(), ""+post.getLocation().getLat(),
 						""+post.getParentId(), post.getContent(), ""+post.getDistance(), df.format(post.getPostTimestamp()), 
 						""+post.getDuration()
 						);
 
-				
+
 			}
 
-		 });
-		 
+		});
+
 
 	}
 
@@ -226,28 +224,45 @@ public class MainActivity extends Activity {
 		getMenuInflater().inflate(R.menu.main, menu);
 		return true;
 	}
-	
+
+	/* we need an options menu, not nav bar */
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-	    	// Handle item selection
-			Log.i("MAINACTIVITY", "item.getItemId():" + item.getItemId());
-			Log.i("MAINACTIVITY", "R.string.settings:" +R.string.settings);
-	    	switch (item.getItemId()) {
-	        case R.id.action_settings:
-		        {
-		        	Log.i("MAINACTIVITY", "R.string.settings:");
-		        	Intent settingsActivity = new Intent(getBaseContext(),BlockcastPreferenceActivity.class);
-		        	startActivity(settingsActivity);
-		        }
-	        case R.string.view_posts:
-	        {
-	        	Log.i("MAINACTIVITY", "R.string.settings:");
-	        	Intent viewPostsActivity = new Intent(getBaseContext(),ViewPostsActivity.class);
-	        	startActivity(viewPostsActivity);
-	        }
-	    	}
-	    	return true;
-	 }
-	
+		// Handle item selection
+		Log.i("MAINACTIVITY", "item.getItemId():" + item.getItemId());
+		Log.i("MAINACTIVITY", "R.string.settings:" +R.string.settings);
+		switch (item.getItemId()) {
+		case R.id.action_settings:
+		{
+			Log.i("MAINACTIVITY", "action_settings!");
+			Intent settingsActivity = new Intent(getBaseContext(),BlockcastPreferenceActivity.class);
+			startActivity(settingsActivity);
+			break;
+		}
+		case R.string.view_posts:
+		{
+			Log.i("MAINACTIVITY", "view_posts!");
+			//Intent viewPostsActivity = new Intent(getBaseContext(),ViewPostsActivity.class);
+			//startActivity(viewPostsActivity);
+			break;
+		}
+		}
+		return true;
+	}
 
+	
+	/*
+	public void getPosts(View view) {
+		 
+		EditText emailEditText = (EditText) findViewById(R.id.email_address);
+		String email = emailEditText.getText().toString();
+		 
+		if( email != null && !email.isEmpty()) {
+		 
+		String urlString = apiURL + "LicenseInfo.RegisteredUser.UserID=" + strikeIronUserName + "&LicenseInfo.RegisteredUser.Password=" + strikeIronPassword + "&VerifyEmail.Email=" + email + "&VerifyEmail.Timeout=30";
+		 
+		new CallAPI().execute(urlString);
+		 
+	}
+		*/
 }

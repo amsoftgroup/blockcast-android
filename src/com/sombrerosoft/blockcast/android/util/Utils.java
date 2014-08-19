@@ -14,4 +14,7 @@ public class Utils {
 					cm.getActiveNetworkInfo().isConnected());
 
 	}
+	
+	public final static String servername = "http://www.blockcast.me";
+	public final static String api = "/restapiv1.0/";
 }
