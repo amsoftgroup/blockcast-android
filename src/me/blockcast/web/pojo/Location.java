@@ -9,7 +9,7 @@ public class Location implements java.io.Serializable {
 	public Location(){
 	}
 	
-	public Location(double lon, double lat){
+	public Location(double lat, double lon){
 		this.lon = lon;
 		this.lat = lat;
 	}

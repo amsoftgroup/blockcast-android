@@ -6,7 +6,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.TimeZone;
 
-import me.blockcast.web.pojo.Location;
+
+
+//import me.blockcast.web.pojo.Location;
 import me.blockcast.web.pojo.Post;
 
 import org.apache.http.HttpResponse;
@@ -16,8 +18,12 @@ import org.apache.http.entity.mime.MultipartEntityBuilder;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.location.Location;
+import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.http.AndroidHttpClient;
 import android.os.AsyncTask;
@@ -44,6 +50,7 @@ import org.osmdroid.views.MapController;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.ItemizedIconOverlay;
 import org.osmdroid.views.overlay.ItemizedIconOverlay.OnItemGestureListener;
+import org.osmdroid.views.overlay.MyLocationOverlay;
 import org.osmdroid.views.overlay.OverlayItem;
 import org.osmdroid.views.overlay.OverlayManager;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
@@ -55,14 +62,23 @@ public class MainActivity extends Activity {
 	private MapView mapView;
 	//private ResourceProxyImpl resProxyImp = new ResourceProxyImpl(this);
 	private IMapController mapController;
+	private OverlayItem myCurrentLocationOverlayItem;
 	private ItemizedIconOverlay<OverlayItem> myLocationOverlay;
-	//private MyLocationNewOverlay mMyLocationOverlay;
+	private MyLocationNewOverlay currentLocationOverlay;
 	//private GpsMyLocationProvider imlp = new GpsMyLocationProvider(this.getBaseContext());
-
+	
 	@SuppressLint("SimpleDateFormat")
 	private SimpleDateFormat df = new SimpleDateFormat(timeformat);  
 
 	private final String TAG = "MainActivity";
+
+
+	private Location mLocation;
+	private LocationManager mLocationManager;
+	private String SYSTEM_OF_MEASUREMENT = "METRIC";
+	private boolean network_enabled = false;
+	
+	private MyLocationListener locationListener;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -70,6 +86,8 @@ public class MainActivity extends Activity {
 		//setContentView(R.layout.activity_main);
 		//setContentView();
 		df.setTimeZone(TimeZone.getTimeZone("GMT"));  
+		locationListener = new MyLocationListener();
+
 	}
 
 
@@ -156,6 +174,32 @@ public class MainActivity extends Activity {
 		super.onResume();
 		setContentView(R.layout.activity_viewposts);
 
+		mLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+
+		try{
+			network_enabled = mLocationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+			Log.d(TAG, "NETWORK_PROVIDER enabled");
+		}catch(Exception ex){
+			Log.e(TAG, "NETWORK_PROVIDER not enabled: " + ex.toString());
+		}   
+
+		if (network_enabled){
+			mLocation = mLocationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+			mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 30000, (float) 5, locationListener); 	
+		}else{
+			
+			AlertDialog.Builder alertbox = new AlertDialog.Builder(this);
+			alertbox.setMessage("Cannot determine location: NETWORK_PROVIDER.");
+			alertbox.setNeutralButton("Ok", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface arg0, int arg1) {
+					//Toast.makeText(getApplicationContext(), "OK button clicked", Toast.LENGTH_LONG).show();
+				}
+			});
+			alertbox.show();
+			return;
+		}
+
+		
 		mapView = (MapView) findViewById(R.id.mapview);
 
 		mapView.setTileSource(TileSourceFactory.DEFAULT_TILE_SOURCE);
@@ -165,8 +209,14 @@ public class MainActivity extends Activity {
 		mapController = mapView.getController();
 		mapController.setZoom(15);
 
-		GeoPoint mapCenter = new GeoPoint(53554070, -2959520);
-		GeoPoint overlayPoint = new GeoPoint(53554070 + 1000, -2959520 + 1000);
+		// geolocate 
+		/*
+		 * https://code.google.com/p/osmdroid/source/browse/trunk/osmdroid-android/src/main/java/org/osmdroid/views/overlay/MyLocationOverlay.java?r=1123
+		 */
+
+		
+		GeoPoint mapCenter = new GeoPoint( mLocation.getLatitude() * 1e6, mLocation.getLatitude() * 1e6);
+		GeoPoint overlayPoint = new GeoPoint(mLocation.getLatitude() * 1e6 + 1000, mLocation.getLatitude() * 1e6 + 1000);
 		mapController.setCenter(mapCenter);
 
 		ArrayList<OverlayItem> overlays = new ArrayList<OverlayItem>();
@@ -185,9 +235,10 @@ public class MainActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 				Post post = new Post();
-				Location l = new Location();
-				l.setLat(38.8951);
-				l.setLon(77.036);
+				me.blockcast.web.pojo.Location l = new me.blockcast.web.pojo.Location();
+				
+				l.setLat(mLocation.getLatitude());
+				l.setLon(mLocation.getLongitude());
 				post.setLocation(l);
 				post.setParentId(-1);
 				post.setContent(text.getText().toString());
@@ -210,7 +261,7 @@ public class MainActivity extends Activity {
 						""+post.getDuration()
 						);
 
-
+				text.setText("");
 			}
 
 		});
@@ -235,7 +286,8 @@ public class MainActivity extends Activity {
 		case R.id.action_settings:
 		{
 			Log.i("MAINACTIVITY", "action_settings!");
-			Intent settingsActivity = new Intent(getBaseContext(),BlockcastPreferenceActivity.class);
+			//Intent settingsActivity = new Intent(getBaseContext(),BlockcastPreferenceActivity.class);
+			Intent settingsActivity = new Intent(getBaseContext(),SampleLoader.class);
 			startActivity(settingsActivity);
 			break;
 		}
@@ -250,6 +302,25 @@ public class MainActivity extends Activity {
 		return true;
 	}
 
+	
+	public class MyLocationListener implements LocationListener {
+
+	    public void onLocationChanged(android.location.Location location) {
+	    	mLocation = location;
+	       
+	    }
+
+	    public void onProviderDisabled(String provider) {
+	    }
+
+	    public void onProviderEnabled(String provider) {
+	    }
+
+	    public void onStatusChanged(String provider, int status, Bundle extras) {
+	    }
+	}
+
+	
 	
 	/*
 	public void getPosts(View view) {
@@ -266,3 +337,5 @@ public class MainActivity extends Activity {
 	}
 		*/
 }
+
+
