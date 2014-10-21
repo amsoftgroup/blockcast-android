@@ -1,6 +1,6 @@
 /*
+ * package com.sombrerosoft.blockcast.android;
 
-package com.sombrerosoft.blockcast.android;
 
 import java.text.DateFormat;
 import java.text.DecimalFormat;

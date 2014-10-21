@@ -5,6 +5,8 @@ import android.net.ConnectivityManager;
 public class Utils {
 	
 	public static String timeformat = "yyyy/MM/dd HH:mm:ss";
+	
+	public static boolean isDebug = true;
 
 	public static boolean isConnected(ConnectivityManager cm){
 
@@ -15,6 +17,8 @@ public class Utils {
 
 	}
 	
-	public final static String servername = "http://www.blockcast.me";
+	public final static String protocol = "http";
+	public final static String servername = "www.blockcast.me";
 	public final static String api = "/restapiv1.0/";
+	public final static int port = 80;
 }

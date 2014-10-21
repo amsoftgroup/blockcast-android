@@ -29,6 +29,7 @@
     <string name="ONEDAY">1 Day</string> 
     
     <string name="POST">post</string> 
+    <string name="UPLOAD">upload</string> 
 	
     <string name="METRIC">Metric</string>
     <string name="STANDARD">Standard</string>

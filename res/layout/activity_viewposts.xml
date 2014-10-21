@@ -27,10 +27,17 @@
             android:inputType="textMultiLine" />
 
         <Button
-            android:id="@+id/button1"
+            android:id="@+id/button_post"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/POST" />
+        
+         <Button
+            android:id="@+id/button_upload"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/UPLOAD" />
+                
     </LinearLayout>
 
 </LinearLayout>
