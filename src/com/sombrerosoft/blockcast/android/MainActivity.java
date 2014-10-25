@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.TimeZone;
 
+
 //import me.blockcast.web.pojo.Location;
 import me.blockcast.web.pojo.Post;
 
@@ -197,6 +198,7 @@ public class MainActivity extends Activity {
 	
 	@Override
 	protected void onPause() {
+		super.onPause();
         isInForeground = false;
     }
 	
@@ -316,7 +318,7 @@ public class MainActivity extends Activity {
 	
 					String reqstring = Utils.protocol + "://" + Utils.servername + Utils.api + "insertPost/" ;
 	
-					Log.i("MAINACTIVITY", "reqstring:" + reqstring);
+					Log.i(TAG, "reqstring:" + reqstring);
 
 				
 					new NetworkTask().execute(reqstring, ""+post.getLocation().getLat(), ""+post.getLocation().getLon(),
@@ -362,6 +364,7 @@ public class MainActivity extends Activity {
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
+		super.onCreateOptionsMenu(menu);
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.main, menu);
 		return true;
@@ -370,25 +373,35 @@ public class MainActivity extends Activity {
 	/* we need an options menu, not nav bar */
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
+		super.onOptionsItemSelected(item);
 		// Handle item selection
-		Log.i("MAINACTIVITY", "item.getItemId():" + item.getItemId());
-		Log.i("MAINACTIVITY", "R.string.settings:" +R.string.settings);
+		Log.i(TAG, "item.getItemId():" + item.getItemId());
+		Log.i(TAG, "R.string.settings:" +R.string.settings);
+		Log.i(TAG, "R.id.action_settings:" +R.string.settings);
+		Log.i(TAG, "R.id.post:" +R.string.settings);
 		switch (item.getItemId()) {
-		case R.id.action_settings:
-		{
-			Log.i("MAINACTIVITY", "action_settings!");
-			Intent settingsActivity = new Intent(getBaseContext(),BlockcastPreferenceActivity.class);
-			//Intent settingsActivity = new Intent(getBaseContext(),SampleLoader.class);
-			startActivity(settingsActivity);
-			break;
-		}
-		case R.string.view_posts:
-		{
-			Log.i("MAINACTIVITY", "view_posts selected");
-			//Intent viewPostsActivity = new Intent(getBaseContext(),ViewPostsActivity.class);
-			//startActivity(viewPostsActivity);
-			break;
-		}
+			case R.id.action_settings:
+			{
+				Log.i(TAG, "action_settings!");
+				Intent settingsActivity = new Intent(getBaseContext(),BlockcastPreferenceActivity.class);
+				//Intent settingsActivity = new Intent(getBaseContext(),SampleLoader.class);
+				startActivity(settingsActivity);
+				break;
+			}
+			case R.id.view_post:
+			{
+				Log.i(TAG, "view_posts selected");
+				Intent viewPostsActivity = new Intent(getBaseContext(),ListViewLoader.class);
+				startActivity(viewPostsActivity);
+				break;
+			}
+			case R.id.post:
+			{
+				Log.i(TAG, "post selected");
+				Intent mainActivity = new Intent(getBaseContext(),MainActivity.class);
+				startActivity(mainActivity);
+				break;
+			}
 		}
 		return true;
 	}

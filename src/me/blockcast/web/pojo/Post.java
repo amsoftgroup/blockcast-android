@@ -10,14 +10,34 @@ import java.util.Date;
 */
 public class Post implements java.io.Serializable {
 
+	/*
+	 * "content":"test content 2",
+	 * "distance":537,
+	 * "duration":83250,
+	 * "id":799359,
+	 * "lat":19.3022700106744,
+	 * "location":null,
+	 * "lon":-98.5396733640062,
+	 * "parentId":-1,
+	 * "postTimestamp":"Oct 21, 2014",
+	 * "postTimeString":"2014/10/21 20:45:29",
+	 * "sec_elapsed":6662,
+	 * "sec_remaining":76588}
+	 * **/
+	 
 	private long id;
 	private Location location;
+	private long lat;
+	private long lon;
 	private String content;
 	private long parentId;
 	private Date postTimestamp;
 	private long duration;
 	private long distance;
-
+	private String postTimeString;
+	private long sec_elapsed;
+	private long sec_remaining;
+	
 	public Post() {
 	}
 
@@ -91,6 +111,44 @@ public class Post implements java.io.Serializable {
 
 	public void setDuration(long duration) {
 		this.duration = duration;
+	}
+	public long getLat() {
+		return lat;
+	}
+
+	public void setLat(long lat) {
+		this.lat = lat;
+	}
+
+	public long getLon() {
+		return lon;
+	}
+
+	public void setLon(long lon) {
+		this.lon = lon;
+	}
+
+	public String getPostTimeString() {
+		return postTimeString;
+	}
+
+	public void setPostTimeString(String postTimeString) {
+		this.postTimeString = postTimeString;
+	}
+
+	public long getSec_elapsed() {
+		return sec_elapsed;
+	}
+
+	public void setSec_elapsed(long sec_elapsed) {
+		this.sec_elapsed = sec_elapsed;
+	}
+
+	public long getSec_remaining() {
+		return sec_remaining;
+	}
+	public void setSec_remaining(long sec_remaining) {
+		this.sec_remaining = sec_remaining;
 	}
 
 }
