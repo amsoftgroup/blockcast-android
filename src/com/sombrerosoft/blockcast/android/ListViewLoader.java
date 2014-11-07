@@ -62,7 +62,7 @@ import me.blockcast.web.pojo.Post;
 import android.app.LoaderManager;
 
 //public class ListViewLoader extends Activity implements AsyncDelegate{
-public class ListViewLoader extends Activity {
+public class ListViewLoader extends BlockcastBaseActivity {
 
 	private String TAG = "ListViewLoader";
 	private ProgressDialog m_ProgressDialog = null;
@@ -76,10 +76,16 @@ public class ListViewLoader extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
+	
+	}
+
+	@Override
+	public void onResume() {
+		super.onResume();
+
 		m_ProgressDialog = ProgressDialog.show(ListViewLoader.this,    
 				"Please wait...", "Retrieving data ...", true);
-
-		//new BlockcastGet(this).execute();
+		
 		new BlockcastGet().execute();
 
 		setContentView(R.layout.main);
@@ -100,96 +106,18 @@ public class ListViewLoader extends Activity {
 
 	}
 
-	@Override
-	protected void onResume() {
-		super.onResume();
-
-
-	}
-
 	private void getPosts(){
 		Log.i(TAG + ".getPosts()", "calling runonUIThread");
 		runOnUiThread(returnRes);
 		Log.i(TAG + ".getPosts()", "finished runonUIThread");
 	}
 
-	/*
-	 private void updateResultsInUi() {
-
-	       // Back in the UI thread -- update our UI elements based on the data in mResults
-
-	    	if (m_ProgressDialog != null){
-	    		m_ProgressDialog.dismiss();
-	    	}
-
-			GregorianCalendar now = new GregorianCalendar();
-			Date d =  now.getTime();
-			DateFormat df1 = DateFormat.getDateTimeInstance();
-			String s1 = df1.format(d);
-
-			lastupdated.setText("Data refreshed every " + REFRESH_DELAY_MS_INT/1000 + " seconds.\nCurrent as of " + s1);
-
-			if(m_orders != null && m_orders.size() > 0){
-				m_adapter.notifyDataSetChanged();
-				m_adapter.clear();
-				for(int i=0;i<m_orders.size();i++){
-					m_adapter.add(m_orders.get(i));
-				}               
-			}else{	
-				lastupdated.setText("No results returned from WMATA.com.");
-			}
-			m_adapter.notifyDataSetChanged();
-	    }
-	 */	
-
-	/*
-	 private class getItemLists extends
-     AsyncTask<Void, String, ArrayList<Post>> {
- @Override
- protected void onPreExecute() {
-     super.onPreExecute();
- }
-
- @Override
- protected void onProgressUpdate(String... values) {
-     super.onProgressUpdate(values);
- }
-
- @Override
- protected ArrayList<Item> doInBackground(Void... params) {
-     DAO dao = new DAO();
-     ArrayList<Item> fal = dao.ItemsGetList(getActivity());
-     return fal;
- }
-
- @Override
- protected void onPostExecute(ArrayList<Item> result) {
-     super.onPostExecute(result);
-
-     falAdp = new ItemsListAdapter(getActivity(),
-             R.layout.fragment_list_item_text_view, result);
-     setListAdapter(falAdp);
- }
-}
-	 */
 	private class BlockcastGet extends AsyncTask<String, Void, ArrayList<Post>> {
-
-		private AsyncDelegate delegate;
-
-
-		//public BlockcastGet(AsyncDelegate delegate){
-		//    this.delegate = delegate;
-		//}
 
 		@Override
 		protected void onPreExecute() {
 			super.onPreExecute();
 		}
-
-		//@Override
-		//protected void onProgressUpdate(String... values) {
-		//    super.onProgressUpdate(values);
-		//}	
 
 		@Override
 		protected ArrayList<Post> doInBackground(String... params) {
@@ -203,9 +131,13 @@ public class ListViewLoader extends Activity {
 			try {
 
 				HttpHost target = new HttpHost(Utils.servername, Utils.port, Utils.protocol);
-				HttpGet getRequest = new HttpGet(Utils.api + "getPosts");
+				//HttpGet getRequest = new HttpGet(Utils.api + "getPosts");
 
-				Log.i(TAG, "executing http get to " + target.getHostName());
+				HttpGet getRequest = new HttpGet(Utils.api + "getPostsByDistanceAndDuration/" + distance + "/" + mLocation.getLatitude() + "/" + mLocation.getLongitude()); 
+				//Log.i(TAG, "Sending: " + Utils.api + "getPostsByDistanceAndDuration/" + distance + "/" + mLocation.getLatitude() + "/" + mLocation.getLongitude());
+		
+				
+				Log.i(TAG, "executing http get to " + getRequest.getURI().getPath());
 
 				httpResponse = httpclient.execute(target, getRequest);
 
@@ -292,8 +224,10 @@ public class ListViewLoader extends Activity {
 			super.onPostExecute(result);
 
 			Log.i(TAG, "onPostExecute entered result.size()="+result.size());
+			
 			m_posts = result;
-			m_adapter.notifyDataSetChanged();
+			m_adapter.clear();
+		
 			for(int i=0;i<m_posts.size();i++){
 				//Log.i(TAG, "onPostExecute adding " + m_posts.get(i).getContent());
 				m_adapter.add(m_posts.get(i));
@@ -375,8 +309,7 @@ public class ListViewLoader extends Activity {
 		case R.id.action_settings:
 		{
 			Log.i(TAG, "action_settings!");
-			Intent settingsActivity = new Intent(getBaseContext(),BlockcastPreferenceActivity.class);
-			//Intent settingsActivity = new Intent(getBaseContext(),SampleLoader.class);
+			Intent settingsActivity = new Intent(getBaseContext(),BlockcastPreferenceActivity.class);	
 			startActivity(settingsActivity);
 			break;
 		}

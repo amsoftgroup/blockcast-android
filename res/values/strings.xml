@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
-     
     <string name="app_name">blockcast</string>
     <string name="action_settings">Settings</string>
     
@@ -34,7 +32,8 @@
     
     <string name="POST">post</string> 
     <string name="UPLOAD">upload</string> 
-	
+	<string name="DEBUG">debug</string>
+	    
     <string name="METRIC">Metric</string>
     <string name="STANDARD">Standard</string>
     <string name="REMOTE_STATUS_WEBSITE">[insert your webpage for remote status updates here]</string>
@@ -42,4 +41,8 @@
     
     <string name="icon_description">icon</string>
 	<string name="hello">geospatial chat</string>
+	
+	<string name="ON">ON</string> 
+    <string name="OFF">OFF</string> 
+
 </resources>

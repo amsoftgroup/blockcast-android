@@ -11,6 +11,10 @@ import java.util.Date;
 import java.util.TimeZone;
 
 
+
+
+
+
 //import me.blockcast.web.pojo.Location;
 import me.blockcast.web.pojo.Post;
 
@@ -31,6 +35,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -54,11 +59,14 @@ import com.sombrerosoft.blockcast.android.util.Utils;
 
 import org.osmdroid.DefaultResourceProxyImpl;
 import org.osmdroid.api.IMapController;
+import org.osmdroid.bonuspack.overlays.BasicInfoWindow;
+import org.osmdroid.bonuspack.overlays.Polygon;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.util.ResourceProxyImpl;
 import org.osmdroid.views.MapController;
 import org.osmdroid.views.MapView;
+import org.osmdroid.views.overlay.DirectedLocationOverlay;
 import org.osmdroid.views.overlay.ItemizedIconOverlay;
 import org.osmdroid.views.overlay.ItemizedIconOverlay.OnItemGestureListener;
 import org.osmdroid.views.overlay.MyLocationOverlay;
@@ -73,9 +81,7 @@ import org.osmdroid.views.overlay.OverlayManager;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
 
-public class MainActivity extends Activity {
-
-	private boolean isInForeground;
+public class MainActivity extends BlockcastBaseActivity {
 
 	private String timeformat = Utils.timeformat;
 	private MapView mapView;
@@ -92,12 +98,11 @@ public class MainActivity extends Activity {
 	private final String TAG = "MainActivity";
 
 	private SharedPreferences prefs;
-	private Location mLocation;
-	private LocationManager mLocationManager;
+	//private Location mLocation;
+	//private LocationManager mLocationManager;
 	private String SYSTEM_OF_MEASUREMENT = "METRIC";
-	private boolean network_enabled = false;
-	
-	private MyLocationListener locationListener;
+	//private boolean network_enabled = false;	
+	//private MyLocationListener locationListener;
 
 	//In an Activity
 	private String[] mFileList;
@@ -112,9 +117,14 @@ public class MainActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		//setContentView(R.layout.activity_main);
 		//setContentView();
+		/*
 		df.setTimeZone(TimeZone.getTimeZone("GMT"));  
 		locationListener = new MyLocationListener();
 
+		prefs = PreferenceManager.getDefaultSharedPreferences(this);
+		distance = Long.parseLong(prefs.getString("DISTANCE", "100"));
+	    duration = Long.parseLong(prefs.getString("DURATION", "3600"));
+	    */
 	}
 
 
@@ -183,10 +193,11 @@ public class MainActivity extends Activity {
 				try {
 					is = result.getEntity().getContent();
 					String response_text = IOUtils.toString(is, "UTF-8");
-					//if (isInForeground && Utils.isDebug){
+					Log.e(TAG, "debug = " + debug);
+					if ((debug != null) && (debug.equals("1"))){
 						Toast toast = Toast.makeText(getApplicationContext(), response_text, Toast.LENGTH_SHORT);
 						toast.show();
-					//}
+					}
 				} catch (IllegalStateException e) {
 					Log.e(TAG, e.toString());
 				} catch (IOException e) {
@@ -199,42 +210,13 @@ public class MainActivity extends Activity {
 	@Override
 	protected void onPause() {
 		super.onPause();
-        isInForeground = false;
     }
 	
 	@Override
 	protected void onResume() {
 		super.onResume();
-		isInForeground = true;
-		
+
 		setContentView(R.layout.activity_viewposts);
-
-		prefs = PreferenceManager.getDefaultSharedPreferences(this);
-		mLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-
-		try{
-			network_enabled = mLocationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
-			Log.d(TAG, "NETWORK_PROVIDER enabled");
-		}catch(Exception ex){
-			Log.e(TAG, "NETWORK_PROVIDER not enabled: " + ex.toString());
-		}   
-
-		if (network_enabled){
-			mLocation = mLocationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-			mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 30000, (float) 5, locationListener); 	
-		}else{
-			
-			AlertDialog.Builder alertbox = new AlertDialog.Builder(this);
-			alertbox.setMessage("Cannot determine location: NETWORK_PROVIDER.");
-			alertbox.setNeutralButton("Ok", new DialogInterface.OnClickListener() {
-				public void onClick(DialogInterface arg0, int arg1) {
-					//Toast.makeText(getApplicationContext(), "OK button clicked", Toast.LENGTH_LONG).show();
-				}
-			});
-			alertbox.show();
-			return;
-		}
-
 		
 		mapView = (MapView) findViewById(R.id.mapview);
 		mapView.setTileSource(TileSourceFactory.MAPNIK);
@@ -249,18 +231,26 @@ public class MainActivity extends Activity {
 		 */
 		
 		mapCenter = new GeoPoint((int)(mLocation.getLatitude() * 1e6), (int)( mLocation.getLongitude() * 1e6));
-		Log.d(TAG, "" + mLocation.getLatitude() + " " +  mLocation.getLongitude() );
-		Log.d(TAG, "" + (int)(mLocation.getLatitude() * 1e6) + " " +  (int)( mLocation.getLongitude() * 1e6) );
-		//GeoPoint overlayPoint = new GeoPoint((mLocation.getLongitude() * 1e6) + 1000, (mLocation.getLatitude() * 1e6) + 1000);
 
+		Polygon circle = new Polygon(this);
+		circle.setPoints(Polygon.pointsAsCircle(mapCenter, distance));
+		circle.setFillColor(0x12121212);
+		circle.setStrokeColor(Color.RED);
+		circle.setStrokeWidth(2);
+		this.mapView.getOverlays().add(circle);
+		//circle.setInfoWindow(new BasicInfoWindow(R.layout.bonuspack_bubble, map));
+		//circle.setTitle("Centered on "+p.getLatitude()+","+p.getLongitude());
 		overlayItemArray = new ArrayList<OverlayItem>();
-
-		overlayItemArray.add(new OverlayItem("New Overlay", "Overlay Description", mapCenter));
-
+		overlayItemArray.add(new OverlayItem("center", "MapCenter", mapCenter));
+		
+		
 		DefaultResourceProxyImpl resourceProxy = new DefaultResourceProxyImpl(this);
+		//DirectedLocationOverlay dlo = new DirectedLocationOverlay(getBaseContext());
+	
 		this.myLocationOverlay = new ItemizedIconOverlay<OverlayItem>(overlayItemArray, null, resourceProxy);
 		this.mapView.getOverlays().add(this.myLocationOverlay);
-
+		
+		//this.mapView.getOverlays().add(dlo);
 		//mapView.invalidate();
 		
 		mapView = (MapView) findViewById(R.id.mapview);
@@ -300,10 +290,7 @@ public class MainActivity extends Activity {
 			public void onClick(View v) {
 				
 				if ((text.getText().toString() != null) && (text.getText().toString().length() > 0)){
-					
-					long distance = Long.parseLong(prefs.getString("DISTANCE", "100"));
-					long duration = Long.parseLong(prefs.getString("DURATION", "3600"));
-					
+										
 					Post post = new Post();
 					me.blockcast.web.pojo.Location l = new me.blockcast.web.pojo.Location();
 					
@@ -454,32 +441,5 @@ public class MainActivity extends Activity {
 	}
 */
 	
-	
-	public class MyLocationListener implements LocationListener {
-
-	    public void onLocationChanged(android.location.Location location) {
-	    	mLocation = location;
-	    	//if (isInForeground && Utils.isDebug){
-	    		Toast.makeText(getApplicationContext(), "acquired your new location @ (" + mLocation.getLatitude() + "lat, " +  mLocation.getLongitude() + "lon)", Toast.LENGTH_LONG).show();
-	    	//}
-	    	mapCenter = new GeoPoint((int)(mLocation.getLatitude() * 1e6), (int)( mLocation.getLongitude() * 1e6));
-	    	mapView.invalidate();
-	    	mapController.setCenter(mapCenter);
-	    	//if (isInForeground && Utils.isDebug){
-	    		Toast.makeText(getApplicationContext(), "revalidated mapview", Toast.LENGTH_LONG).show();
-	    	//}
-	    }
-
-	    public void onProviderDisabled(String provider) {
-	    }
-
-	    public void onProviderEnabled(String provider) {
-	    }
-
-	    public void onStatusChanged(String provider, int status, Bundle extras) {
-	    }
-	}
 
 }
-
-

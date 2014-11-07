@@ -30,7 +30,14 @@
 			android:key="MEASUREMENT_TYPE"
 			android:entries="@array/measurementArray"
 			android:entryValues="@array/measurementValues" />
-											               
+						
+     	<ListPreference
+			android:title="Debug Messages"
+			android:summary="Show Debug Info"
+			android:key="DEBUG"
+			android:entries="@array/debugArray"
+			android:entryValues="@array/debugValues" />
+     	     						               
         </PreferenceCategory>
 
 </PreferenceScreen>

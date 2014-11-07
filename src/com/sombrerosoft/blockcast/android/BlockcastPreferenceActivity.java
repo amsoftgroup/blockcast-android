@@ -17,15 +17,15 @@ public class BlockcastPreferenceActivity extends PreferenceActivity {
 	private String system_of_measurement;
 	private String distance;
 	private String duration;
+	private String debug;
 	
 
 	private String TAG = "BlockcastPreferenceActivity";
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-	
-		addPreferencesFromResource(R.xml.preferences);
 
+		addPreferencesFromResource(R.xml.preferences);
 	}
 	
 	@Override
@@ -41,7 +41,7 @@ public class BlockcastPreferenceActivity extends PreferenceActivity {
         duration = prefs.getString("DURATION", "3600");
         refresh_delay_ms = prefs.getString("REFRESH_DELAY_MS", "nr1");
     	system_of_measurement = prefs.getString("MEASUREMENT_TYPE", "METRIC");
-    	
+    	debug = prefs.getString("DEBUG", "0"); 
     }
     
 }

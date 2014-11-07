@@ -51,4 +51,14 @@
     <item>@string/METRIC</item>
 	<item>@string/STANDARD</item>
   </string-array>
+  
+  <array name="debugArray">
+    <item>@string/ON</item>
+	<item>@string/OFF</item>
+  </array>
+  <string-array name="debugValues">
+	<item>1</item>   
+	<item>0</item>   
+  </string-array>
+  
 </resources>

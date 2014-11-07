@@ -9,6 +9,8 @@ package com.sombrerosoft.blockcast;
 
 public final class R {
     public static final class array {
+        public static final int debugArray=0x7f050008;
+        public static final int debugValues=0x7f050009;
         public static final int distanceArray=0x7f050002;
         public static final int distanceValues=0x7f050003;
         public static final int durationArray=0x7f050004;
@@ -81,25 +83,28 @@ public final class R {
         public static final int main=0x7f090000;
     }
     public static final class string {
+        public static final int DEBUG=0x7f07001b;
         public static final int FIFTEENMINUTES=0x7f070012;
         public static final int FIVEHUNDRED=0x7f070011;
         public static final int FORTYFIVE=0x7f07000d;
-        public static final int METRIC=0x7f07001b;
+        public static final int METRIC=0x7f07001c;
+        public static final int OFF=0x7f070023;
+        public static final int ON=0x7f070022;
         public static final int ONEDAY=0x7f070018;
         public static final int ONEHUNDRED=0x7f07000f;
         public static final int POST=0x7f070019;
-        public static final int REMOTE_STATUS_WEBSITE=0x7f07001d;
+        public static final int REMOTE_STATUS_WEBSITE=0x7f07001e;
         public static final int SIXHOURS=0x7f070016;
         public static final int SIXTY=0x7f07000e;
         public static final int SIXTYMINUTES=0x7f070014;
-        public static final int STANDARD=0x7f07001c;
+        public static final int STANDARD=0x7f07001d;
         public static final int THIRTY=0x7f07000c;
         public static final int THIRTYMINUTES=0x7f070013;
         public static final int THREEHOURS=0x7f070015;
         public static final int TWELVEHOURS=0x7f070017;
         public static final int TWOHUNDREDFIFTY=0x7f070010;
         public static final int UPLOAD=0x7f07001a;
-        public static final int WMATA_KEY=0x7f07001e;
+        public static final int WMATA_KEY=0x7f07001f;
         public static final int about=0x7f070006;
         public static final int action_post=0x7f070002;
         public static final int action_settings=0x7f070001;
@@ -107,9 +112,9 @@ public final class R {
         public static final int eula_accept=0x7f070009;
         public static final int eula_refuse=0x7f07000a;
         public static final int eula_title=0x7f070008;
-        public static final int hello=0x7f070020;
+        public static final int hello=0x7f070021;
         public static final int hello_world=0x7f070005;
-        public static final int icon_description=0x7f07001f;
+        public static final int icon_description=0x7f070020;
         public static final int post=0x7f070004;
         public static final int settings=0x7f070007;
         public static final int status=0x7f07000b;
