@@ -2,6 +2,7 @@ package me.blockcast.web.pojo;
 
 //Generated Feb 22, 2014 9:46:04 AM by Hibernate Tools 3.4.0.CR1
 
+import java.io.File;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -31,12 +32,15 @@ public class Post implements java.io.Serializable {
 	private long lon;
 	private String content;
 	private long parentId;
-	private Date postTimestamp;
+	//private Date postTimestamp;
 	private long duration;
 	private long distance;
-	private String postTimeString;
+	private long epoch;
+	//private String postTimeString;
 	private long sec_elapsed;
 	private long sec_remaining;
+	private File file;
+	private String filePath = null;
 	
 	public Post() {
 	}
@@ -49,12 +53,12 @@ public class Post implements java.io.Serializable {
 	}
 
 	public Post(long id, Location location, String content, long parentId,
-			Date postTimestamp) {
+			long epoch) {
 		this.id = id;
 		this.location = location;
 		this.content = content;
 		this.parentId = parentId;
-		this.postTimestamp = postTimestamp;
+		this.epoch = epoch;
 	}
 
 	public long getId() {
@@ -89,6 +93,7 @@ public class Post implements java.io.Serializable {
 		this.parentId = parentId;
 	}
 
+/*
 	public Date getPostTimestamp() {
 		return this.postTimestamp;
 	}
@@ -96,7 +101,7 @@ public class Post implements java.io.Serializable {
 	public void setPostTimestamp(Date postTimestamp) {
 		this.postTimestamp = postTimestamp;
 	}
-
+*/
 	public long getDistance() {
 		return distance;
 	}
@@ -127,7 +132,7 @@ public class Post implements java.io.Serializable {
 	public void setLon(long lon) {
 		this.lon = lon;
 	}
-
+/*
 	public String getPostTimeString() {
 		return postTimeString;
 	}
@@ -135,7 +140,7 @@ public class Post implements java.io.Serializable {
 	public void setPostTimeString(String postTimeString) {
 		this.postTimeString = postTimeString;
 	}
-
+*/
 	public long getSec_elapsed() {
 		return sec_elapsed;
 	}
@@ -149,6 +154,30 @@ public class Post implements java.io.Serializable {
 	}
 	public void setSec_remaining(long sec_remaining) {
 		this.sec_remaining = sec_remaining;
+	}
+
+	public long getEpoch() {
+		return epoch;
+	}
+
+	public void setEpoch(long epoch) {
+		this.epoch = epoch;
+	}
+
+	public File getFile() {
+		return file;
+	}
+
+	public void setFile(File file) {
+		this.file = file;
+	}
+
+	public String getFilePath() {
+		return filePath;
+	}
+
+	public void setFilePath(String filePath) {
+		this.filePath = filePath;
 	}
 
 }

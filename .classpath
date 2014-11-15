@@ -1,9 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="con" path="com.android.ide.eclipse.adt.ANDROID_FRAMEWORK"/>
-	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.DEPENDENCIES"/>
 	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.LIBRARIES"/>
+	<classpathentry exported="true" kind="lib" path="libs/commons-codec-1.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/commons-io-2.4.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/commons-logging-1.1.3.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/httpclient-4.3.3.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/httpclient-cache-4.3.3.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/android-support-v4.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/fluent-hc-4.3.3.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/httpcore-4.3.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/osmbonuspack_v4.9.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/osmdroid-android-4.2.jar"/>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="gen"/>
+	<classpathentry exported="true" kind="lib" path="libs/httpmime-4.3.3.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/osmdroid-third-party-4.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/slf4j-android-1.5.8.jar"/>
+	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.DEPENDENCIES"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>

@@ -16,11 +16,13 @@
 	<item>@string/ONEHUNDRED</item>
 	<item>@string/TWOHUNDREDFIFTY</item>
 	<item>@string/FIVEHUNDRED</item>	
+	<item>@string/TWENTYTHOUSAND</item>	
   </array>
   <string-array name="distanceValues">
 	<item>100</item>  
 	<item>250</item>  
 	<item>500</item> 
+	<item>20000</item> 
   </string-array>
   
    <array name="durationArray">

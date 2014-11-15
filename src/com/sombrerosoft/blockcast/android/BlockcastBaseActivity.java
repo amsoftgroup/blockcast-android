@@ -17,6 +17,7 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.widget.Toast;
 
 public class BlockcastBaseActivity extends Activity implements ActivityLifecycleCallbacks {
 	

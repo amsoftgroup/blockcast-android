@@ -10,15 +10,15 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 
-import org.apache.commons.io.IOUtils;
+//import org.apache.commons.io.IOUtils;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.mime.HttpMultipartMode;
-import org.apache.http.entity.mime.MultipartEntityBuilder;
+//import org.apache.http.entity.mime.HttpMultipartMode;
+//import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
@@ -42,6 +42,8 @@ import android.net.ConnectivityManager;
 import android.net.http.AndroidHttpClient;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.CountDownTimer;
+import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.provider.ContactsContract;
 import android.util.Log;
@@ -53,6 +55,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.ArrayAdapter;
+import android.widget.Chronometer;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.SimpleCursorAdapter;
@@ -72,11 +75,10 @@ public class ListViewLoader extends BlockcastBaseActivity {
 	private ListView lv;
 	ArrayList<String> listdata = new ArrayList<String>();     
 
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
-	
 	}
 
 	@Override
@@ -188,11 +190,11 @@ public class ListViewLoader extends BlockcastBaseActivity {
 								p.setId(((JSONObject)json.get(j)).getLong("id"));
 								p.setLat(((JSONObject)json.get(j)).getLong("lat"));
 								p.setLon(((JSONObject)json.get(j)).getLong("lon"));
-								p.setPostTimeString(((JSONObject)json.get(j)).getString("postTimeString"));
+								p.setEpoch(((JSONObject)json.get(j)).getLong("epoch"));
 								//p.setLocation(((JSONObject)json.get(j)).getLong("location"));
 								p.setParentId(((JSONObject)json.get(j)).getLong("parentId"));
 								p.setSec_elapsed(((JSONObject)json.get(j)).getLong("sec_elapsed"));
-								p.setSec_remaining(((JSONObject)json.get(j)).getLong("sec_remaining"));
+								//p.setSec_remaining(((JSONObject)json.get(j)).getLong("sec_remaining"));
 								//p.setPostTimestamp(((JSONObject)json.get(j)).getString("postTimeStamp"));
 								posts.add(p);
 							} catch (JSONException e) {
@@ -267,22 +269,43 @@ public class ListViewLoader extends BlockcastBaseActivity {
 
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent) {
+
 			View v = convertView;
 			if (v == null) {
 				LayoutInflater vi = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 				v = vi.inflate(R.layout.row, null);
 			}
 			Post o = items.get(position);
+			
 			if (o != null) {
+				
+				long baseTime = SystemClock.elapsedRealtime();
+				Log.i(TAG, " baseTime = " + baseTime);
+				long sec_elapsed = o.getSec_elapsed();
+				Log.i(TAG, " sec_elapsed = " + sec_elapsed);
+				long sec_remaining = o.getDuration() - sec_elapsed;
+				Log.i(TAG, " sec_remaining = " + sec_remaining);	
+				
+				//long epoch = o.get
+				Date now = new Date();
+				long now_seconds = now.getTime();
+				//long then = o.=-o];
+				
 				TextView tt = (TextView) v.findViewById(R.id.toptext);
 				//Log.e(TAG, "toptext: " + tt.getText());
 				TextView bt = (TextView) v.findViewById(R.id.bottomtext);
 				//Log.e(TAG, "bottomtext: " + bt.getText());
+				Chronometer c = (Chronometer) v.findViewById(R.id.chronometer);
+				
 				if (tt != null) {
 					tt.setText(o.getContent());                            
 				}
 				if(bt != null){
-					bt.setText(o.getDistance() + "m " + o.getSec_remaining() + "/" + o.getDuration() + "s");
+					bt.setText(o.getDistance() + "m " + (o.getDuration() - sec_elapsed) + "/" + o.getDuration() + "s");
+				}
+				if (c !=null){
+                    c.setBase(0);
+                    c.start();
 				}
 			}
 			return v;
@@ -305,29 +328,27 @@ public class ListViewLoader extends BlockcastBaseActivity {
 		Log.i(TAG, "R.string.settings:" +R.string.settings);
 		Log.i(TAG, "R.id.action_settings:" +R.string.settings);
 		Log.i(TAG, "R.id.post:" +R.string.settings);
-		switch (item.getItemId()) {
-		case R.id.action_settings:
-		{
+		
+		if (item.getItemId() == R.id.action_settings)  {
+
 			Log.i(TAG, "action_settings!");
 			Intent settingsActivity = new Intent(getBaseContext(),BlockcastPreferenceActivity.class);	
 			startActivity(settingsActivity);
-			break;
-		}
-		case R.id.view_post:
-		{
+	
+		}else if (item.getItemId() == R.id.view_post){
+	
 			Log.i(TAG, "view_posts selected");
 			Intent viewPostsActivity = new Intent(getBaseContext(),ListViewLoader.class);
 			startActivity(viewPostsActivity);
-			break;
-		}
-		case R.id.post:
-		{
+			
+		}else if (item.getItemId() ==R.id.post){
+	
 			Log.i(TAG, "post selected");
 			Intent mainActivity = new Intent(getBaseContext(),MainActivity.class);
 			startActivity(mainActivity);
-			break;
+			
 		}
-		}
+		
 		return true;
 	}
 	//@Override
