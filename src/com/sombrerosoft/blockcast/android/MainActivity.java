@@ -145,7 +145,8 @@ public class MainActivity extends BlockcastBaseActivity {
 			builder.addTextBody("lat", lat);
 			builder.addTextBody("lon", lon);
 			if (filepath != null){
-				builder.addBinaryBody("file", new File(filepath), ContentType.APPLICATION_OCTET_STREAM, "test.jpg");
+				File f = new File(filepath);
+				builder.addBinaryBody("file", f, ContentType.APPLICATION_OCTET_STREAM, f.getName());
 			}else{
 				//builder.addBinaryBody("file", null);
 			}
