@@ -1,6 +1,6 @@
-package me.blockcast.web.pojo;
+package me.blockcast.common;
 
-public class Location implements java.io.Serializable {
+public class Location {
 
 	private double lat;
 	private double lon;

@@ -4,15 +4,13 @@
     android:layout_height="?android:attr/listPreferredItemHeight"
     android:padding="6dip">
  
-    <!-- 
+
     <ImageView
         android:id="@+id/icon"
         android:layout_width="wrap_content"
         android:layout_height="48dip"
         android:layout_marginRight="6dip"
-        android:src="@drawable/wdc" 
         android:contentDescription="@string/icon_description"/>
-     -->
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="0dp"

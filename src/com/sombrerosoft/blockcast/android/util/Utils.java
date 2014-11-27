@@ -52,5 +52,6 @@ public class Utils {
 	public final static String protocol = "http";
 	public final static String servername = "www.blockcast.me";
 	public final static String api = "/restapiv1.0/";
+	public final static String images = "/static/";
 	public final static int port = 80;
 }

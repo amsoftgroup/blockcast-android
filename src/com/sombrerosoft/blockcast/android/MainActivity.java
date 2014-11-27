@@ -13,7 +13,7 @@ import java.util.TimeZone;
 
 
 //import me.blockcast.web.pojo.Location;
-import me.blockcast.web.pojo.Post;
+import me.blockcast.common.Post;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
@@ -99,6 +99,7 @@ public class MainActivity extends BlockcastBaseActivity {
 	private SharedPreferences prefs;
 	private String SYSTEM_OF_MEASUREMENT = "METRIC";
 	private String filepath = null;
+	private String postcontent = null;
 	private File file = null;
 
 
@@ -128,7 +129,7 @@ public class MainActivity extends BlockcastBaseActivity {
 			String lat = params[1];
 			String lon = params[2];
 			String parentId = params[3];
-			String content  = params[4];
+			postcontent  = params[4];
 			String distance = params[5];
 			String time = params[6];
 			String duration = params[7];
@@ -137,7 +138,7 @@ public class MainActivity extends BlockcastBaseActivity {
 			MultipartEntityBuilder builder = MultipartEntityBuilder.create();     
 			//builder.setBoundary("+++BOUNDARY+++");
 			builder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
-			builder.addTextBody("content", content);
+			builder.addTextBody("content", postcontent);
 			builder.addTextBody("parentId", parentId);
 			builder.addTextBody("time", time);
 			builder.addTextBody("duration", duration);
@@ -164,7 +165,7 @@ public class MainActivity extends BlockcastBaseActivity {
 			} catch (IOException e1) {
 				Log.e(TAG, "IOException:" + e1.toString());
 			}
-			byte[] entityContentAsBytes = out.toByteArray();
+//			byte[] entityContentAsBytes = out.toByteArray();
 			// or convert to string
 			String entityContentAsString = new String(out.toByteArray());
 
@@ -175,12 +176,14 @@ public class MainActivity extends BlockcastBaseActivity {
 
 			try {
 				response = client.execute(httpPost);
+				//filepath = null;
+				//postcontent = null;				
 			} catch (IOException e) {
 				Log.e(TAG, e.toString());
 			} finally {
 				client.close();
 			}
-
+			
 			return response;
 		}
 
@@ -215,7 +218,8 @@ public class MainActivity extends BlockcastBaseActivity {
 	protected void onResume() {
 		super.onResume();
 
-		setContentView(R.layout.activity_viewposts);				
+		setContentView(R.layout.activity_viewposts);	
+
 		mapView = (MapView) findViewById(R.id.mapview);
 
 		//mapView.invalidate();
@@ -254,15 +258,21 @@ public class MainActivity extends BlockcastBaseActivity {
 		final Button upload = (Button) findViewById(R.id.button_upload);
 		//final TextView text = (TextView) findViewById(R.id.textView1);
 		final EditText text = (EditText) findViewById(R.id.editText1);
+		
+		if (postcontent != null){
+			text.setText(postcontent);
+		}
+		
 		post.setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
 
 				if ((text.getText().toString() != null) && (text.getText().toString().length() > 0)){
-
+					
+					postcontent = text.getText().toString();
 					Post post = new Post();
-					me.blockcast.web.pojo.Location l = new me.blockcast.web.pojo.Location();
+					me.blockcast.common.Location l = new me.blockcast.common.Location();
 
 					l.setLat(mLocation.getLatitude());
 					l.setLon(mLocation.getLongitude());
@@ -273,27 +283,14 @@ public class MainActivity extends BlockcastBaseActivity {
 					post.setEpoch((new Date().getTime())/1000l);
 					post.setDuration(duration);
 					if (filepath !=null){
-						post.setFilePath(filepath);
+						post.setMedia_file(filepath);
 					}
 					String reqstring = Utils.protocol + "://" + Utils.servername + Utils.api + "insertPost/" ;
 					Log.i(TAG, "reqstring:" + reqstring);
 
-/*			
-					 
-					String target = params[0];
-					String lat = params[1];
-					String lon = params[2];
-					String parentId = params[3];
-					String content  = params[4];
-					String distance = params[5];
-					String time = params[6];
-					String duration = params[7];
-					filepath = params[8];
-*/
 					new NetworkTask().execute(reqstring, ""+post.getLocation().getLat(), ""+post.getLocation().getLon(),
 							""+post.getParentId(), post.getContent(), ""+post.getDistance(), "" + post.getEpoch(), 
-							""+post.getDuration(), post.getFilePath()
-							);
+							""+post.getDuration(), post.getMedia_file());
 
 					text.setText("");
 				}else{
@@ -307,6 +304,9 @@ public class MainActivity extends BlockcastBaseActivity {
 			@Override
 			public void onClick(View v) {
 
+				if ((text.getText().toString() != null) && (text.getText().toString().length() > 0)){
+					postcontent = text.getText().toString();
+				}
 				// Create the ACTION_GET_CONTENT Intent
 				Intent getContentIntent = FileUtils.createGetContentIntent();
 
@@ -352,10 +352,6 @@ public class MainActivity extends BlockcastBaseActivity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		super.onOptionsItemSelected(item);
 		// Handle item selection
-		Log.i(TAG, "item.getItemId():" + item.getItemId());
-		Log.i(TAG, "R.string.settings:" +R.string.settings);
-		Log.i(TAG, "R.id.action_settings:" +R.string.settings);
-		Log.i(TAG, "R.id.post:" +R.string.settings);
 
 		if (item.getItemId() == R.id.action_settings) {
 
@@ -380,54 +376,5 @@ public class MainActivity extends BlockcastBaseActivity {
 
 		return true;
 	}
-
-	/*// file upload 
-	public class FireMissilesDialogFragment extends DialogFragment {
-		protected Dialog onCreateDialog(int id) {
-		    Dialog dialog = null;
-		    AlertDialog.Builder builder = new Builder(getApplicationContext());
-
-		    switch(id) {
-		        case DIALOG_LOAD_FILE:
-		            builder.setTitle("Choose your file");
-		            if(mFileList == null) {
-		                Log.e(TAG, "Showing file picker before loading the file list");
-		                dialog = builder.create();
-		                return dialog;
-		            }
-		            builder.setItems(mFileList, new DialogInterface.OnClickListener() {
-		                public void onClick(DialogInterface dialog, int which) {
-		                    mChosenFile = mFileList[which];
-		                    //you can do stuff with the file here too
-		                }
-		            });
-		            break;
-		    }
-		    dialog = builder.show();
-		    return dialog;
-		}
-	}
-	private void loadFileList() {
-	    try {
-	        mPath.mkdirs();
-	    }
-	    catch(SecurityException e) {
-	        Log.e(TAG, "unable to write on the sd card " + e.toString());
-	    }
-	    if(mPath.exists()) {
-	        FilenameFilter filter = new FilenameFilter() {
-	            public boolean accept(File dir, String filename) {
-	                File sel = new File(dir, filename);
-	                return filename.contains(FTYPE) || sel.isDirectory();
-	            }
-	        };
-	        mFileList = mPath.list(filter);
-	    }
-	    else {
-	        mFileList= new String[0];
-	    }
-	}
-	 */
-
 
 }

@@ -1,6 +1,7 @@
 package com.sombrerosoft.blockcast.android;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -9,6 +10,10 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
+
+
+
+
 
 //import org.apache.commons.io.IOUtils;
 import org.apache.http.Header;
@@ -38,6 +43,8 @@ import android.content.Intent;
 import android.content.Loader;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.ConnectivityManager;
 import android.net.http.AndroidHttpClient;
 import android.os.AsyncTask;
@@ -56,12 +63,13 @@ import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.ArrayAdapter;
 import android.widget.Chronometer;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
-import me.blockcast.web.pojo.Post;
+import me.blockcast.common.Post;
 import android.app.LoaderManager;
 
 //public class ListViewLoader extends Activity implements AsyncDelegate{
@@ -74,7 +82,7 @@ public class ListViewLoader extends BlockcastBaseActivity {
 	private Runnable viewOrders;
 	private ListView lv;
 	ArrayList<String> listdata = new ArrayList<String>();     
-
+	//private Bitmap mIcon11 = null;
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -89,7 +97,7 @@ public class ListViewLoader extends BlockcastBaseActivity {
 				"Please wait...", "Retrieving data ...", true);
 		
 		new BlockcastGet().execute();
-
+		
 		setContentView(R.layout.main);
 		m_posts = new ArrayList<Post>();
 		this.m_adapter = new PostAdapter(this, R.layout.row, m_posts);
@@ -111,9 +119,9 @@ public class ListViewLoader extends BlockcastBaseActivity {
 	private void getPosts(){
 		Log.i(TAG + ".getPosts()", "calling runonUIThread");
 		runOnUiThread(returnRes);
-		Log.i(TAG + ".getPosts()", "finished runonUIThread");
+		Log.i(TAG + ".getPosts()", "finished runonUIThread");	
 	}
-
+	
 	private class BlockcastGet extends AsyncTask<String, Void, ArrayList<Post>> {
 
 		@Override
@@ -191,11 +199,15 @@ public class ListViewLoader extends BlockcastBaseActivity {
 								p.setLat(((JSONObject)json.get(j)).getLong("lat"));
 								p.setLon(((JSONObject)json.get(j)).getLong("lon"));
 								p.setEpoch(((JSONObject)json.get(j)).getLong("epoch"));
-								//p.setLocation(((JSONObject)json.get(j)).getLong("location"));
 								p.setParentId(((JSONObject)json.get(j)).getLong("parentId"));
-								p.setSec_elapsed(((JSONObject)json.get(j)).getLong("sec_elapsed"));
-								//p.setSec_remaining(((JSONObject)json.get(j)).getLong("sec_remaining"));
-								//p.setPostTimestamp(((JSONObject)json.get(j)).getString("postTimeStamp"));
+								//p.setSec_elapsed(((JSONObject)json.get(j)).getLong("sec_elapsed"));
+								p.setMedia_preview(((JSONObject)json.get(j)).getString("media_preview"));
+								
+								if ((p.getMedia_preview() != null) && (!p.getMedia_preview().equalsIgnoreCase("null"))){
+									InputStream in = new java.net.URL(Utils.protocol + "://" + Utils.servername + Utils.images + p.getMedia_preview()).openStream();
+									p.setImage(BitmapFactory.decodeStream(in));
+								} 
+								//p.setMediaFile(((JSONObject)json.get(j)).<File>("mediafile"));
 								posts.add(p);
 							} catch (JSONException e) {
 								Log.e(TAG, "Exiting. doInBackground: " + e.toString());
@@ -280,11 +292,12 @@ public class ListViewLoader extends BlockcastBaseActivity {
 			if (o != null) {
 				
 				long baseTime = SystemClock.elapsedRealtime();
-				Log.i(TAG, " baseTime = " + baseTime);
+				//Log.i(TAG, " baseTime = " + baseTime);
 				long sec_elapsed = o.getSec_elapsed();
-				Log.i(TAG, " sec_elapsed = " + sec_elapsed);
+				//Log.i(TAG, " sec_elapsed = " + sec_elapsed);
 				long sec_remaining = o.getDuration() - sec_elapsed;
-				Log.i(TAG, " sec_remaining = " + sec_remaining);	
+				//Log.i(TAG, " sec_remaining = " + sec_remaining);	
+				
 				
 				//long epoch = o.get
 				Date now = new Date();
@@ -296,7 +309,8 @@ public class ListViewLoader extends BlockcastBaseActivity {
 				TextView bt = (TextView) v.findViewById(R.id.bottomtext);
 				//Log.e(TAG, "bottomtext: " + bt.getText());
 				Chronometer c = (Chronometer) v.findViewById(R.id.chronometer);
-				
+				ImageView iv = (ImageView) v.findViewById(R.id.icon);
+
 				if (tt != null) {
 					tt.setText(o.getContent());                            
 				}
@@ -306,6 +320,9 @@ public class ListViewLoader extends BlockcastBaseActivity {
 				if (c !=null){
                     c.setBase(0);
                     c.start();
+				}
+				if ((iv !=null) && (o.getImage() !=null)){
+					iv.setImageBitmap(o.getImage());
 				}
 			}
 			return v;
