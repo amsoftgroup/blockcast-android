@@ -322,7 +322,11 @@ public class ListViewLoader extends BlockcastBaseActivity {
                     c.start();
 				}
 				if ((iv !=null) && (o.getImage() !=null)){
+					Log.i(TAG, "image: " + o.getContent() + " " + o.getImage().getByteCount());
 					iv.setImageBitmap(o.getImage());
+				}else{
+					iv.setImageBitmap(null);
+					Log.i(TAG, "image: " + o.getContent() + " no image.");
 				}
 			}
 			return v;

@@ -11,7 +11,7 @@
 	<classpathentry exported="true" kind="lib" path="libs/fluent-hc-4.3.3.jar"/>
 	<classpathentry exported="true" kind="lib" path="libs/httpcore-4.3.2.jar"/>
 	<classpathentry exported="true" kind="lib" path="libs/osmbonuspack_v4.9.jar"/>
-	<classpathentry exported="true" kind="lib" path="libs/osmdroid-android-4.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/osmdroid-android-4.2.jar" sourcepath="C:/Users/breed/.m2/repository/org/osmdroid/osmdroid-android/4.2/osmdroid-android-4.2-sources.jar"/>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="gen"/>
 	<classpathentry exported="true" kind="lib" path="libs/httpmime-4.3.3.jar"/>

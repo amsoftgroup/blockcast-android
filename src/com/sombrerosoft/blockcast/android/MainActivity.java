@@ -12,6 +12,10 @@ import java.util.TimeZone;
 
 
 
+
+
+
+
 //import me.blockcast.web.pojo.Location;
 import me.blockcast.common.Post;
 
@@ -47,6 +51,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.ViewTreeObserver;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -61,15 +66,18 @@ import org.osmdroid.api.IMapController;
 import org.osmdroid.bonuspack.overlays.BasicInfoWindow;
 import org.osmdroid.bonuspack.overlays.Polygon;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
+import org.osmdroid.util.BoundingBoxE6;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.util.ResourceProxyImpl;
 import org.osmdroid.views.MapController;
 import org.osmdroid.views.MapView;
+import org.osmdroid.views.Projection;
 import org.osmdroid.views.overlay.DirectedLocationOverlay;
 import org.osmdroid.views.overlay.ItemizedIconOverlay;
 import org.osmdroid.views.overlay.ItemizedIconOverlay.OnItemGestureListener;
 import org.osmdroid.views.overlay.MyLocationOverlay;
 import org.osmdroid.views.overlay.OverlayItem;
+import org.osmdroid.views.overlay.OverlayItem.HotspotPlace;
 import org.osmdroid.views.overlay.OverlayManager;
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider;
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay;
@@ -89,6 +97,7 @@ public class MainActivity extends BlockcastBaseActivity {
 	private ItemizedIconOverlay<OverlayItem> myLocationOverlay;
 	private ArrayList<OverlayItem> overlayItemArray;
 	private MyLocationNewOverlay mMyLocationOverlay;
+	private BoundingBoxE6 bbox;
 	//private GpsMyLocationProvider imlp = new GpsMyLocationProvider(this.getBaseContext());
 	private static final int REQUEST_CHOOSER = 1234;
 
@@ -108,16 +117,6 @@ public class MainActivity extends BlockcastBaseActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		//setContentView(R.layout.activity_main);
-		//setContentView();
-		/*
-		df.setTimeZone(TimeZone.getTimeZone("GMT"));  
-		locationListener = new MyLocationListener();
-
-		prefs = PreferenceManager.getDefaultSharedPreferences(this);
-		distance = Long.parseLong(prefs.getString("DISTANCE", "100"));
-	    duration = Long.parseLong(prefs.getString("DURATION", "3600"));
-		 */
 	}
 
 
@@ -151,6 +150,7 @@ public class MainActivity extends BlockcastBaseActivity {
 			}else{
 				//builder.addBinaryBody("file", null);
 			}
+			
 			HttpPost httpPost = new HttpPost(target);
 			httpPost.setEntity(builder.build());
 
@@ -183,6 +183,8 @@ public class MainActivity extends BlockcastBaseActivity {
 			} finally {
 				client.close();
 			}
+			filepath = null;
+			postcontent = null;
 			
 			return response;
 		}
@@ -218,50 +220,76 @@ public class MainActivity extends BlockcastBaseActivity {
 	protected void onResume() {
 		super.onResume();
 
-		setContentView(R.layout.activity_viewposts);	
-
+		setContentView(R.layout.activity_viewposts);
+		
 		mapView = (MapView) findViewById(R.id.mapview);
+		final Projection pj = mapView.getProjection();
+		
+		Log.i(TAG, "Projection = " + pj.getNorthEast().toString() + " " + pj.getSouthWest().toString());
+		mapController = mapView.getController();
+		mapController.setZoom(17);
 
-		//mapView.invalidate();
 		mapView.setTileSource(TileSourceFactory.MAPNIK);
 		mapView.setBuiltInZoomControls(true);
 		mapView.setMultiTouchControls(true);
-		mapController = mapView.getController();
-		mapController.setZoom(18);
+		
+		bbox = mapView.getBoundingBox();
+		Log.i(TAG, bbox.toString());
 		// geolocate 
-		/*
-		 * https://code.google.com/p/osmdroid/source/browse/trunk/osmdroid-android/src/main/java/org/osmdroid/views/overlay/MyLocationOverlay.java?r=1123
-		 */	
-		mapCenter = new GeoPoint((int)(mLocation.getLatitude() * 1e6), (int)( mLocation.getLongitude() * 1e6));
-		Log.e(TAG, "mLocation.getLatitude() * 1e6 = " + mLocation.getLatitude());
-		Log.e(TAG, "mLocation.getLongitude() * 1e6 = " + mLocation.getLongitude());
+		// https://code.google.com/p/osmdroid/source/browse/trunk/osmdroid-android/src/main/java/org/osmdroid/views/overlay/MyLocationOverlay.java?r=1123
 
+		mapCenter = new GeoPoint((int)(mLocation.getLatitude() * 1e6), (int)( mLocation.getLongitude() * 1e6));
+		Log.i(TAG, "mLocation.getLatitude() * 1e6 = " + mLocation.getLatitude());
+		Log.i(TAG, "mLocation.getLongitude() * 1e6 = " + mLocation.getLongitude());
 		mapController.setCenter(mapCenter);
+		//mapController.animateTo(mapCenter);
+
+		//NE corner is post lat lon! we need to recenter.
+		bbox = mapView.getBoundingBox();
+		Log.i(TAG, bbox.toString());
+		
 		Polygon circle = new Polygon(this);
 		circle.setPoints(Polygon.pointsAsCircle(mapCenter, distance));
 		circle.setFillColor(0x12121212);
 		circle.setStrokeColor(Color.RED);
 		circle.setStrokeWidth(2);
 		this.mapView.getOverlays().add(circle);
-		//circle.setInfoWindow(new BasicInfoWindow(R.layout.bonuspack_bubble, map));
-		//circle.setTitle("Centered on "+p.getLatitude()+","+p.getLongitude());
+		
 		overlayItemArray = new ArrayList<OverlayItem>();
-		overlayItemArray.add(new OverlayItem("center", "MapCenter", mapCenter));	
+		OverlayItem item = new OverlayItem("center", "MapCenter", mapCenter);
+		item.setMarkerHotspot(HotspotPlace.BOTTOM_CENTER);
+		overlayItemArray.add(item);	       
+
 		DefaultResourceProxyImpl resourceProxy = new DefaultResourceProxyImpl(this);
 		this.myLocationOverlay = new ItemizedIconOverlay<OverlayItem>(overlayItemArray, null, resourceProxy);
 		this.mapView.getOverlays().add(this.myLocationOverlay);
 
-		mapView.setBuiltInZoomControls(true);
-		mapView.setMultiTouchControls(true);	
+
+		//mapView.setBuiltInZoomControls(true);
+		//mapView.setMultiTouchControls(true);	
 
 		final Button post = (Button) findViewById(R.id.button_post);
 		final Button upload = (Button) findViewById(R.id.button_upload);
 		//final TextView text = (TextView) findViewById(R.id.textView1);
 		final EditText text = (EditText) findViewById(R.id.editText1);
 		
+		mapController.setCenter(mapCenter);
+		
+		mapView.invalidate();
+		
 		if (postcontent != null){
 			text.setText(postcontent);
 		}
+		
+		/* TODO https://groups.google.com/forum/#!topic/osmdroid/PCeSzz-Tg_E*/
+		
+		ViewTreeObserver vto = mapView.getViewTreeObserver();
+		vto.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+		    @Override
+		    public void onGlobalLayout() {
+		    	mapView.getController().setCenter(mapCenter);
+		    }
+		});
 		
 		post.setOnClickListener(new OnClickListener() {
 
@@ -376,5 +404,6 @@ public class MainActivity extends BlockcastBaseActivity {
 
 		return true;
 	}
+
 
 }
