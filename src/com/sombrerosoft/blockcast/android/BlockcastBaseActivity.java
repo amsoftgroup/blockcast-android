@@ -3,6 +3,8 @@ package com.sombrerosoft.blockcast.android;
 import java.text.SimpleDateFormat;
 import java.util.TimeZone;
 
+import org.osmdroid.util.GeoPoint;
+
 import com.sombrerosoft.blockcast.android.util.Utils;
 
 import android.app.Activity;
@@ -36,19 +38,16 @@ public class BlockcastBaseActivity extends Activity implements ActivityLifecycle
 	public long duration = -1;
 	protected String debug = "0";
 	protected static MyLocationListener locationListener;
-	
+	private GeoPoint mapCenter = null;
+
 	@Override
     protected void onCreate(Bundle saved) {
         super.onCreate(saved);
         
         df.setTimeZone(TimeZone.getTimeZone("GMT"));  
         mLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        locationListener = new MyLocationListener();
+        locationListener = new MyLocationListener();    	
 
-		prefs = PreferenceManager.getDefaultSharedPreferences(this);
-		distance = Long.parseLong(prefs.getString("DISTANCE", "100"));
-	    duration = Long.parseLong(prefs.getString("DURATION", "3600"));
-	    debug = prefs.getString("DEBUG", "0");
     }
 	
 	@Override
@@ -60,8 +59,11 @@ public class BlockcastBaseActivity extends Activity implements ActivityLifecycle
     protected void onResume() {
         super.onResume();
         
+        prefs = PreferenceManager.getDefaultSharedPreferences(this);
         debug = prefs.getString("DEBUG", "0");
-        
+        distance = Long.parseLong(prefs.getString("DISTANCE", "100"));
+	    duration = Long.parseLong(prefs.getString("DURATION", "3600"));
+	    
 		try{
 			network_enabled = mLocationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
 			Log.d(TAG, "NETWORK_PROVIDER enabled");
@@ -102,7 +104,9 @@ public class BlockcastBaseActivity extends Activity implements ActivityLifecycle
     protected class MyLocationListener implements LocationListener {
 
 	    public void onLocationChanged(android.location.Location location) {
+	    	Log.i(TAG, "onLocationChanged lat:" + location.getLatitude() + "lon:" + location.getLongitude());
 	    	mLocation = location;
+	    	
 	    }
 
 	    public void onProviderDisabled(String provider) {

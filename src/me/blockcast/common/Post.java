@@ -28,6 +28,9 @@ public class Post implements java.io.Serializable {
 	private String media_preview;
 	private String media_file;
 	private Bitmap image;
+	private String guid;
+
+
 
 	public Post() {}
 
@@ -160,8 +163,13 @@ public class Post implements java.io.Serializable {
 	public Bitmap getImage() {
 		return image;
 	}
-
 	public void setImage(Bitmap image) {
 		this.image = image;
+	}
+	public String getGuid() {
+		return guid;
+	}
+	public void setGuid(String guid) {
+		this.guid = guid;
 	}
 }

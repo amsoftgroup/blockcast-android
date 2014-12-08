@@ -10,26 +10,18 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
-
-
-
-
-
-//import org.apache.commons.io.IOUtils;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
-//import org.apache.http.entity.mime.HttpMultipartMode;
-//import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
+import com.ipaulpro.afilechooser.utils.FileUtils;
 import com.sombrerosoft.blockcast.R;
 import com.sombrerosoft.blockcast.android.util.Utils;
 
@@ -60,8 +52,10 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.Chronometer;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -81,6 +75,7 @@ public class ListViewLoader extends BlockcastBaseActivity {
 	private PostAdapter m_adapter;
 	private Runnable viewOrders;
 	private ListView lv;
+	private Button send;
 	ArrayList<String> listdata = new ArrayList<String>();     
 	//private Bitmap mIcon11 = null;
 	
@@ -99,6 +94,18 @@ public class ListViewLoader extends BlockcastBaseActivity {
 		new BlockcastGet().execute();
 		
 		setContentView(R.layout.main);
+
+		send = (Button)this.findViewById(R.id.button_send);  
+		send.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				Log.i(TAG, "send.onClick");
+				Intent postIntent = new Intent(getBaseContext(),MainActivity.class);	
+				startActivity(postIntent);
+			}
+		});
+		
 		m_posts = new ArrayList<Post>();
 		this.m_adapter = new PostAdapter(this, R.layout.row, m_posts);
 		lv = (ListView)this.findViewById(android.R.id.list);  
@@ -322,11 +329,9 @@ public class ListViewLoader extends BlockcastBaseActivity {
                     c.start();
 				}
 				if ((iv !=null) && (o.getImage() !=null)){
-					Log.i(TAG, "image: " + o.getContent() + " " + o.getImage().getByteCount());
 					iv.setImageBitmap(o.getImage());
 				}else{
 					iv.setImageBitmap(null);
-					Log.i(TAG, "image: " + o.getContent() + " no image.");
 				}
 			}
 			return v;

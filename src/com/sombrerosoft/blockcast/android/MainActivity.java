@@ -16,6 +16,7 @@ import java.util.TimeZone;
 
 
 
+
 //import me.blockcast.web.pojo.Location;
 import me.blockcast.common.Post;
 
@@ -133,6 +134,9 @@ public class MainActivity extends BlockcastBaseActivity {
 			String time = params[6];
 			String duration = params[7];
 			filepath = params[8];
+			String guid = params[9];
+			
+			Log.i(TAG, "GUID:"+guid);
 			
 			MultipartEntityBuilder builder = MultipartEntityBuilder.create();     
 			//builder.setBoundary("+++BOUNDARY+++");
@@ -144,6 +148,7 @@ public class MainActivity extends BlockcastBaseActivity {
 			builder.addTextBody("distance", distance);
 			builder.addTextBody("lat", lat);
 			builder.addTextBody("lon", lon);
+			builder.addTextBody("guid", guid);
 			if (filepath != null){
 				File f = new File(filepath);
 				builder.addBinaryBody("file", f, ContentType.APPLICATION_OCTET_STREAM, f.getName());
@@ -214,6 +219,8 @@ public class MainActivity extends BlockcastBaseActivity {
 	@Override
 	protected void onPause() {
 		super.onPause();
+		mapView = (MapView) findViewById(R.id.mapview);
+		mapView.invalidate();
 	}
 
 	@Override
@@ -223,6 +230,8 @@ public class MainActivity extends BlockcastBaseActivity {
 		setContentView(R.layout.activity_viewposts);
 		
 		mapView = (MapView) findViewById(R.id.mapview);
+		//mapView.invalidate();
+		
 		final Projection pj = mapView.getProjection();
 		
 		Log.i(TAG, "Projection = " + pj.getNorthEast().toString() + " " + pj.getSouthWest().toString());
@@ -255,6 +264,8 @@ public class MainActivity extends BlockcastBaseActivity {
 		circle.setStrokeWidth(2);
 		this.mapView.getOverlays().add(circle);
 		
+		
+		
 		overlayItemArray = new ArrayList<OverlayItem>();
 		OverlayItem item = new OverlayItem("center", "MapCenter", mapCenter);
 		item.setMarkerHotspot(HotspotPlace.BOTTOM_CENTER);
@@ -264,7 +275,7 @@ public class MainActivity extends BlockcastBaseActivity {
 		this.myLocationOverlay = new ItemizedIconOverlay<OverlayItem>(overlayItemArray, null, resourceProxy);
 		this.mapView.getOverlays().add(this.myLocationOverlay);
 
-
+		mapView.invalidate();
 		//mapView.setBuiltInZoomControls(true);
 		//mapView.setMultiTouchControls(true);	
 
@@ -281,7 +292,10 @@ public class MainActivity extends BlockcastBaseActivity {
 			text.setText(postcontent);
 		}
 		
-		/* TODO https://groups.google.com/forum/#!topic/osmdroid/PCeSzz-Tg_E*/
+/* 
+ * 		TODO: see https://groups.google.com/forum/#!topic/osmdroid/PCeSzz-Tg_E 
+ * 		this may change in future releases
+ */
 		
 		ViewTreeObserver vto = mapView.getViewTreeObserver();
 		vto.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
@@ -315,15 +329,21 @@ public class MainActivity extends BlockcastBaseActivity {
 					}
 					String reqstring = Utils.protocol + "://" + Utils.servername + Utils.api + "insertPost/" ;
 					Log.i(TAG, "reqstring:" + reqstring);
-
+					Log.i(TAG, "GUID:" + Installation.id(getBaseContext()));
+					
 					new NetworkTask().execute(reqstring, ""+post.getLocation().getLat(), ""+post.getLocation().getLon(),
 							""+post.getParentId(), post.getContent(), ""+post.getDistance(), "" + post.getEpoch(), 
-							""+post.getDuration(), post.getMedia_file());
+							""+post.getDuration(), post.getMedia_file(), Installation.id(getBaseContext()));
 
 					text.setText("");
 				}else{
 					Toast.makeText(getApplicationContext(), "Can't post empty content! Please type some text.", Toast.LENGTH_SHORT).show();
 				}
+				
+				// send to view posts?
+				Log.i(TAG, "viewing posts");
+				Intent viewPostsActivity = new Intent(getBaseContext(),ListViewLoader.class);
+				startActivity(viewPostsActivity);
 			}
 		});	
 
@@ -382,24 +402,18 @@ public class MainActivity extends BlockcastBaseActivity {
 		// Handle item selection
 
 		if (item.getItemId() == R.id.action_settings) {
-
 			Log.i(TAG, "action_settings!");
 			Intent settingsActivity = new Intent(getBaseContext(),BlockcastPreferenceActivity.class);
 			startActivity(settingsActivity);
-
 		}else if (item.getItemId() == R.id.view_post){
-
 			Log.i(TAG, "view_posts selected");
 			Intent viewPostsActivity = new Intent(getBaseContext(),ListViewLoader.class);
 			startActivity(viewPostsActivity);
-
 		}
 		else if (item.getItemId() == R.id.post){
-
 			Log.i(TAG, "post selected");
 			Intent mainActivity = new Intent(getBaseContext(),MainActivity.class);
 			startActivity(mainActivity);
-
 		}
 
 		return true;
