@@ -39,9 +39,9 @@ int drawable zoom_in 0x7f020015
 int drawable zoom_out 0x7f020016
 int id action_settings 0x7f0b000d
 int id bottomtext 0x7f0b000b
-int id button_post 0x7f0b0002
+int id button_post 0x7f0b0003
 int id button_send 0x7f0b0006
-int id button_upload 0x7f0b0003
+int id button_upload 0x7f0b0002
 int id chronometer 0x7f0b000c
 int id delays 0x7f0b0005
 int id editText1 0x7f0b0001

@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
+
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
@@ -21,6 +22,7 @@ import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
 import com.ipaulpro.afilechooser.utils.FileUtils;
 import com.sombrerosoft.blockcast.R;
 import com.sombrerosoft.blockcast.android.util.Utils;
@@ -31,6 +33,8 @@ import android.app.LoaderManager;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.CursorLoader;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnCancelListener;
 import android.content.Intent;
 import android.content.Loader;
 import android.content.SharedPreferences;
@@ -78,6 +82,12 @@ public class ListViewLoader extends BlockcastBaseActivity {
 	private Button send;
 	ArrayList<String> listdata = new ArrayList<String>();     
 	//private Bitmap mIcon11 = null;
+	private CountDownTimer countDownTimer;
+	private boolean timerHasStarted = false;
+	private TextView tt;
+	private TextView bt;
+	private Chronometer c;
+	private ImageView iv;
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -88,11 +98,25 @@ public class ListViewLoader extends BlockcastBaseActivity {
 	public void onResume() {
 		super.onResume();
 
-		m_ProgressDialog = ProgressDialog.show(ListViewLoader.this,    
-				"Please wait...", "Retrieving data ...", true);
+		final BlockcastGet bcg = new BlockcastGet();
+		bcg.execute();
 		
+		m_ProgressDialog = ProgressDialog.show(ListViewLoader.this, "Please wait...", "Retrieving data ...", true);
+		m_ProgressDialog.setCancelable(true);
+
+		m_ProgressDialog.setOnCancelListener(new OnCancelListener() {
+
+			@Override
+			public void onCancel(DialogInterface dialog) {
+				bcg.cancel(true);
+			}
+
+		});
+		
+		m_ProgressDialog.show();
+
 		new BlockcastGet().execute();
-		
+
 		setContentView(R.layout.main);
 
 		send = (Button)this.findViewById(R.id.button_send);  
@@ -154,7 +178,7 @@ public class ListViewLoader extends BlockcastBaseActivity {
 				//Log.i(TAG, "Sending: " + Utils.api + "getPostsByDistanceAndDuration/" + distance + "/" + mLocation.getLatitude() + "/" + mLocation.getLongitude());
 		
 				
-				Log.i(TAG, "executing http get to " + getRequest.getURI().getPath());
+				Log.i(TAG, "executing http get to " + getRequest.getURI().toString());
 
 				httpResponse = httpclient.execute(target, getRequest);
 
@@ -298,6 +322,9 @@ public class ListViewLoader extends BlockcastBaseActivity {
 			
 			if (o != null) {
 				
+
+
+				  
 				long baseTime = SystemClock.elapsedRealtime();
 				//Log.i(TAG, " baseTime = " + baseTime);
 				long sec_elapsed = o.getSec_elapsed();
@@ -311,18 +338,19 @@ public class ListViewLoader extends BlockcastBaseActivity {
 				long now_seconds = now.getTime();
 				//long then = o.=-o];
 				
-				TextView tt = (TextView) v.findViewById(R.id.toptext);
+				tt = (TextView) v.findViewById(R.id.toptext);
 				//Log.e(TAG, "toptext: " + tt.getText());
-				TextView bt = (TextView) v.findViewById(R.id.bottomtext);
+				bt = (TextView) v.findViewById(R.id.bottomtext);
 				//Log.e(TAG, "bottomtext: " + bt.getText());
-				Chronometer c = (Chronometer) v.findViewById(R.id.chronometer);
-				ImageView iv = (ImageView) v.findViewById(R.id.icon);
+				c = (Chronometer) v.findViewById(R.id.chronometer);
+				iv = (ImageView) v.findViewById(R.id.icon);
 
 				if (tt != null) {
 					tt.setText(o.getContent());                            
 				}
 				if(bt != null){
-					bt.setText(o.getDistance() + "m " + (o.getDuration() - sec_elapsed) + "/" + o.getDuration() + "s");
+					//Date expiry = new Date(Long.parseLong("" + o.getEpoch() * 1000l));
+					bt.setText(o.getDistance() + "m " + ( o.getDuration()) + "s");		  
 				}
 				if (c !=null){
                     c.setBase(0);
@@ -381,4 +409,22 @@ public class ListViewLoader extends BlockcastBaseActivity {
 	//public void asyncComplete(boolean success) {
 	//	m_adapter.notifyDataSetChanged();
 	//}
+	public class MyCountDownTimer extends CountDownTimer {
+		  public MyCountDownTimer(long startTime, long interval) {
+			  super(startTime, interval);
+		  }
+		 
+		  @Override
+		  public void onFinish() {
+			  //text.setText("Time's up!");
+		  }
+		 
+		  @Override
+		  public void onTick(long millisUntilFinished) {
+			 // text.setText("" + millisUntilFinished / 1000);
+		  }
+	}
+	
 }
+
+

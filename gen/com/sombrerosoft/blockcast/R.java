@@ -66,9 +66,9 @@ public final class R {
     public static final class id {
         public static final int action_settings=0x7f0b000d;
         public static final int bottomtext=0x7f0b000b;
-        public static final int button_post=0x7f0b0002;
+        public static final int button_post=0x7f0b0003;
         public static final int button_send=0x7f0b0006;
-        public static final int button_upload=0x7f0b0003;
+        public static final int button_upload=0x7f0b0002;
         public static final int chronometer=0x7f0b000c;
         public static final int delays=0x7f0b0005;
         public static final int editText1=0x7f0b0001;

@@ -5,7 +5,9 @@ import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.util.Enumeration;
 
+import android.content.Context;
 import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.text.format.Formatter;
@@ -16,13 +18,32 @@ public class Utils {
 	
 	public static boolean isDebug = true;
 
-	public static boolean isConnected(ConnectivityManager cm){
+	public static NetworkStatus isConnected(Context c){
+		
+		NetworkStatus status = new NetworkStatus();
 
-		//if ( cm.getNetworkInfo(0).getState() == android.net.NetworkInfo.State.CONNECTED ||  cm.getNetworkInfo(1).getState() == android.net.NetworkInfo.State.CONNECTED  );
-		return  (cm.getActiveNetworkInfo() != null &&
-					cm.getActiveNetworkInfo().isAvailable() &&
-					cm.getActiveNetworkInfo().isConnected());
+		ConnectivityManager connectivityManager = (ConnectivityManager)
+                c.getSystemService(Context.CONNECTIVITY_SERVICE);
 
+		ConnectivityManager connManager = (ConnectivityManager) c.getSystemService(c.CONNECTIVITY_SERVICE);
+		NetworkInfo mWifi = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+		NetworkInfo mEthernet = connManager.getNetworkInfo(ConnectivityManager.TYPE_ETHERNET);
+		NetworkInfo m3G = connManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
+		NetworkInfo bt = connManager.getNetworkInfo(ConnectivityManager.TYPE_BLUETOOTH);
+		
+		if (mWifi!=null) status.setOnWifi(mWifi.isConnected());
+		if (mEthernet!=null) status.setOnEthernet(mEthernet.isConnected());
+		if (m3G!=null) status.setIs3G(m3G.isConnected());
+		if (bt!=null) status.setIs3G(bt.isConnected());
+		
+		if  (connectivityManager.getActiveNetworkInfo() != null &&
+				connectivityManager.getActiveNetworkInfo().isAvailable() &&
+				connectivityManager.getActiveNetworkInfo().isConnected()){
+				status.setConnected(connectivityManager.getActiveNetworkInfo().getType());
+			
+		};
+		
+		return status;
 	}
 	
 	public String getLocalIpAddress() {

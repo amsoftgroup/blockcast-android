@@ -185,6 +185,7 @@ public class MainActivity extends BlockcastBaseActivity {
 				//postcontent = null;				
 			} catch (IOException e) {
 				Log.e(TAG, e.toString());
+
 			} finally {
 				client.close();
 			}
@@ -230,7 +231,7 @@ public class MainActivity extends BlockcastBaseActivity {
 		setContentView(R.layout.activity_viewposts);
 		
 		mapView = (MapView) findViewById(R.id.mapview);
-		//mapView.invalidate();
+		mapView.invalidate();
 		
 		final Projection pj = mapView.getProjection();
 		
@@ -264,8 +265,6 @@ public class MainActivity extends BlockcastBaseActivity {
 		circle.setStrokeWidth(2);
 		this.mapView.getOverlays().add(circle);
 		
-		
-		
 		overlayItemArray = new ArrayList<OverlayItem>();
 		OverlayItem item = new OverlayItem("center", "MapCenter", mapCenter);
 		item.setMarkerHotspot(HotspotPlace.BOTTOM_CENTER);
@@ -275,7 +274,7 @@ public class MainActivity extends BlockcastBaseActivity {
 		this.myLocationOverlay = new ItemizedIconOverlay<OverlayItem>(overlayItemArray, null, resourceProxy);
 		this.mapView.getOverlays().add(this.myLocationOverlay);
 
-		mapView.invalidate();
+		//mapView.invalidate();
 		//mapView.setBuiltInZoomControls(true);
 		//mapView.setMultiTouchControls(true);	
 
