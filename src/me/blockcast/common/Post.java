@@ -29,8 +29,7 @@ public class Post implements java.io.Serializable {
 	private String media_file;
 	private Bitmap image;
 	private String guid;
-
-
+	private int mine;
 
 	public Post() {}
 
@@ -171,5 +170,13 @@ public class Post implements java.io.Serializable {
 	}
 	public void setGuid(String guid) {
 		this.guid = guid;
+	}
+
+	public int getMine() {
+		return mine;
+	}
+
+	public void setMine(int mine) {
+		this.mine = mine;
 	}
 }

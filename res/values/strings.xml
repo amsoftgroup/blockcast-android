@@ -6,7 +6,8 @@
     <string name="action_post">Post</string>
     <string name="view_posts">View Posts</string>
     <string name="post">Post</string>   
-     
+    <string name="delete">delete post</string>   
+      
     <string name="hello_world">Blockcast.me</string>
     <string name="about">About</string>
     <string name="settings">Settings</string>

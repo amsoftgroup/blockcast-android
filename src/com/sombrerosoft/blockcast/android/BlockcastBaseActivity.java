@@ -5,6 +5,8 @@ import java.util.TimeZone;
 
 import org.osmdroid.util.GeoPoint;
 
+import com.sombrerosoft.blockcast.R;
+import com.sombrerosoft.blockcast.android.util.NetworkStatus;
 import com.sombrerosoft.blockcast.android.util.Utils;
 
 import android.app.Activity;
@@ -12,6 +14,7 @@ import android.app.AlertDialog;
 import android.app.Application.ActivityLifecycleCallbacks;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.Location;
 import android.location.LocationListener;
@@ -19,6 +22,8 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.Toast;
 
 public class BlockcastBaseActivity extends Activity implements ActivityLifecycleCallbacks {
@@ -39,11 +44,15 @@ public class BlockcastBaseActivity extends Activity implements ActivityLifecycle
 	protected String debug = "0";
 	protected static MyLocationListener locationListener;
 	private GeoPoint mapCenter = null;
-
+	private NetworkStatus network_status = null;
+	protected boolean is_connected = false;
+	protected String guid = null;
+	
 	@Override
     protected void onCreate(Bundle saved) {
         super.onCreate(saved);
-        
+		
+        guid = Installation.id(getBaseContext());
         df.setTimeZone(TimeZone.getTimeZone("GMT"));  
         mLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         locationListener = new MyLocationListener();    	
@@ -58,6 +67,16 @@ public class BlockcastBaseActivity extends Activity implements ActivityLifecycle
 	@Override
     protected void onResume() {
         super.onResume();
+        
+        is_connected = Utils.isNetworkAvailable(this);
+        
+        if (!is_connected){
+			Toast toast = Toast.makeText(getApplicationContext(), "Not Connected to the Internet!", Toast.LENGTH_SHORT);
+			toast.show();
+        }else{
+			Toast toast = Toast.makeText(getApplicationContext(), "Connected to the Internet!", Toast.LENGTH_SHORT);
+			toast.show();
+        }
         
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
         debug = prefs.getString("DEBUG", "0");
@@ -160,4 +179,51 @@ public class BlockcastBaseActivity extends Activity implements ActivityLifecycle
 		
 		//mLocationManager.removeUpdates(locationListener);
 	}
+	
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		// Inflate the menu; this adds items to the action bar if it is present.
+		getMenuInflater().inflate(R.menu.main, menu);
+		return true;
+	}
+
+	/* we need an options menu, not nav bar */
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		super.onOptionsItemSelected(item);
+		
+		// Handle item selection
+		Log.i(TAG, "item.getItemId():" + item.getItemId());
+		Log.i(TAG, "R.string.settings:" +R.string.settings);
+		Log.i(TAG, "R.id.action_settings:" +R.string.settings);
+		Log.i(TAG, "R.id.post:" +R.string.settings);
+		
+		if (item.getItemId() == R.id.action_settings)  {
+
+			Log.i(TAG, "action_settings!");
+			Intent settingsActivity = new Intent(getBaseContext(),BlockcastPreferenceActivity.class);	
+			startActivity(settingsActivity);			
+			//finish();
+	
+		}else if (item.getItemId() == R.id.view_post){
+	
+			Log.i(TAG, "view_posts selected");
+			Intent viewPostsActivity = new Intent(getBaseContext(),ListViewLoader.class);
+			startActivity(viewPostsActivity);
+			
+			finish();
+			
+		}else if (item.getItemId() ==R.id.post){
+	
+			Log.i(TAG, "post selected");
+			Intent mainActivity = new Intent(getBaseContext(),MainActivity.class);
+			startActivity(mainActivity);
+			
+			//finish();
+			
+		}
+		
+		return true;
+	}
+	
 }

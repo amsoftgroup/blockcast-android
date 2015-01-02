@@ -18,12 +18,17 @@ public class Utils {
 	
 	public static boolean isDebug = true;
 
+	public static boolean isNetworkAvailable(Context c) {
+	    ConnectivityManager connectivityManager 
+	          = (ConnectivityManager) c.getSystemService(Context.CONNECTIVITY_SERVICE);
+	    NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+	    
+	    return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+	}
+	
 	public static NetworkStatus isConnected(Context c){
 		
 		NetworkStatus status = new NetworkStatus();
-
-		ConnectivityManager connectivityManager = (ConnectivityManager)
-                c.getSystemService(Context.CONNECTIVITY_SERVICE);
 
 		ConnectivityManager connManager = (ConnectivityManager) c.getSystemService(c.CONNECTIVITY_SERVICE);
 		NetworkInfo mWifi = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
@@ -35,11 +40,11 @@ public class Utils {
 		if (mEthernet!=null) status.setOnEthernet(mEthernet.isConnected());
 		if (m3G!=null) status.setIs3G(m3G.isConnected());
 		if (bt!=null) status.setIs3G(bt.isConnected());
-		
-		if  (connectivityManager.getActiveNetworkInfo() != null &&
-				connectivityManager.getActiveNetworkInfo().isAvailable() &&
-				connectivityManager.getActiveNetworkInfo().isConnected()){
-				status.setConnected(connectivityManager.getActiveNetworkInfo().getType());
+	    
+		if  (connManager.getActiveNetworkInfo() != null &&
+				connManager.getActiveNetworkInfo().isAvailable() &&
+				connManager.getActiveNetworkInfo().isConnected()){
+				status.setConnected(connManager.getActiveNetworkInfo().getType());
 			
 		};
 		

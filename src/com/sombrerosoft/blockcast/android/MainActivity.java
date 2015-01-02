@@ -17,6 +17,7 @@ import java.util.TimeZone;
 
 
 
+
 //import me.blockcast.web.pojo.Location;
 import me.blockcast.common.Post;
 
@@ -60,6 +61,7 @@ import android.widget.Toast;
 
 import com.ipaulpro.afilechooser.utils.FileUtils;
 import com.sombrerosoft.blockcast.R;
+import com.sombrerosoft.blockcast.android.util.NetworkStatus;
 import com.sombrerosoft.blockcast.android.util.Utils;
 
 import org.osmdroid.DefaultResourceProxyImpl;
@@ -135,9 +137,9 @@ public class MainActivity extends BlockcastBaseActivity {
 			String duration = params[7];
 			filepath = params[8];
 			String guid = params[9];
-			
+
 			Log.i(TAG, "GUID:"+guid);
-			
+
 			MultipartEntityBuilder builder = MultipartEntityBuilder.create();     
 			//builder.setBoundary("+++BOUNDARY+++");
 			builder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
@@ -155,11 +157,11 @@ public class MainActivity extends BlockcastBaseActivity {
 			}else{
 				//builder.addBinaryBody("file", null);
 			}
-			
+
 			HttpPost httpPost = new HttpPost(target);
 			httpPost.setEntity(builder.build());
 
-			
+
 			Log.i(TAG, httpPost.getEntity().toString());
 			Log.i(TAG, httpPost.getEntity().getContentType().getName() + "***" + httpPost.getEntity().getContentType().getValue());
 
@@ -170,7 +172,7 @@ public class MainActivity extends BlockcastBaseActivity {
 			} catch (IOException e1) {
 				Log.e(TAG, "IOException:" + e1.toString());
 			}
-//			byte[] entityContentAsBytes = out.toByteArray();
+			//			byte[] entityContentAsBytes = out.toByteArray();
 			// or convert to string
 			String entityContentAsString = new String(out.toByteArray());
 
@@ -191,7 +193,7 @@ public class MainActivity extends BlockcastBaseActivity {
 			}
 			filepath = null;
 			postcontent = null;
-			
+
 			return response;
 		}
 
@@ -229,12 +231,12 @@ public class MainActivity extends BlockcastBaseActivity {
 		super.onResume();
 
 		setContentView(R.layout.activity_viewposts);
-		
+
 		mapView = (MapView) findViewById(R.id.mapview);
 		mapView.invalidate();
-		
+
 		final Projection pj = mapView.getProjection();
-		
+
 		Log.i(TAG, "Projection = " + pj.getNorthEast().toString() + " " + pj.getSouthWest().toString());
 		mapController = mapView.getController();
 		mapController.setZoom(17);
@@ -242,7 +244,7 @@ public class MainActivity extends BlockcastBaseActivity {
 		mapView.setTileSource(TileSourceFactory.MAPNIK);
 		mapView.setBuiltInZoomControls(true);
 		mapView.setMultiTouchControls(true);
-		
+
 		bbox = mapView.getBoundingBox();
 		Log.i(TAG, bbox.toString());
 		// geolocate 
@@ -257,14 +259,14 @@ public class MainActivity extends BlockcastBaseActivity {
 		//NE corner is post lat lon! we need to recenter.
 		bbox = mapView.getBoundingBox();
 		Log.i(TAG, bbox.toString());
-		
+
 		Polygon circle = new Polygon(this);
 		circle.setPoints(Polygon.pointsAsCircle(mapCenter, distance));
 		circle.setFillColor(0x12121212);
 		circle.setStrokeColor(Color.RED);
 		circle.setStrokeWidth(2);
 		this.mapView.getOverlays().add(circle);
-		
+
 		overlayItemArray = new ArrayList<OverlayItem>();
 		OverlayItem item = new OverlayItem("center", "MapCenter", mapCenter);
 		item.setMarkerHotspot(HotspotPlace.BOTTOM_CENTER);
@@ -282,35 +284,36 @@ public class MainActivity extends BlockcastBaseActivity {
 		final Button upload = (Button) findViewById(R.id.button_upload);
 		//final TextView text = (TextView) findViewById(R.id.textView1);
 		final EditText text = (EditText) findViewById(R.id.editText1);
-		
+
 		mapController.setCenter(mapCenter);
-		
+
 		mapView.invalidate();
-		
+
 		if (postcontent != null){
 			text.setText(postcontent);
 		}
-		
-/* 
- * 		TODO: see https://groups.google.com/forum/#!topic/osmdroid/PCeSzz-Tg_E 
- * 		this may change in future releases
- */
-		
+
+		/* 
+		 * 		TODO: see https://groups.google.com/forum/#!topic/osmdroid/PCeSzz-Tg_E 
+		 * 		this may change in future releases
+		 */
+
 		ViewTreeObserver vto = mapView.getViewTreeObserver();
 		vto.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-		    @Override
-		    public void onGlobalLayout() {
-		    	mapView.getController().setCenter(mapCenter);
-		    }
+			@Override
+			public void onGlobalLayout() {
+				mapView.getController().setCenter(mapCenter);
+			}
 		});
-		
+
+
 		post.setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
 
 				if ((text.getText().toString() != null) && (text.getText().toString().length() > 0)){
-					
+
 					postcontent = text.getText().toString();
 					Post post = new Post();
 					me.blockcast.common.Location l = new me.blockcast.common.Location();
@@ -328,23 +331,27 @@ public class MainActivity extends BlockcastBaseActivity {
 					}
 					String reqstring = Utils.protocol + "://" + Utils.servername + Utils.api + "insertPost/" ;
 					Log.i(TAG, "reqstring:" + reqstring);
-					Log.i(TAG, "GUID:" + Installation.id(getBaseContext()));
-					
+					Log.i(TAG, "GUID:" + guid);
+
 					new NetworkTask().execute(reqstring, ""+post.getLocation().getLat(), ""+post.getLocation().getLon(),
 							""+post.getParentId(), post.getContent(), ""+post.getDistance(), "" + post.getEpoch(), 
-							""+post.getDuration(), post.getMedia_file(), Installation.id(getBaseContext()));
+							""+post.getDuration(), post.getMedia_file(), guid);
 
 					text.setText("");
 				}else{
 					Toast.makeText(getApplicationContext(), "Can't post empty content! Please type some text.", Toast.LENGTH_SHORT).show();
 				}
-				
+
 				// send to view posts?
 				Log.i(TAG, "viewing posts");
+				
 				Intent viewPostsActivity = new Intent(getBaseContext(),ListViewLoader.class);
 				startActivity(viewPostsActivity);
+				
+				finish();
 			}
 		});	
+
 
 		upload.setOnClickListener(new OnClickListener() {
 
@@ -385,38 +392,5 @@ public class MainActivity extends BlockcastBaseActivity {
 			break; 
 		}
 	}
-
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		super.onCreateOptionsMenu(menu);
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.main, menu);
-		return true;
-	}
-
-	/* we need an options menu, not nav bar */
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		super.onOptionsItemSelected(item);
-		// Handle item selection
-
-		if (item.getItemId() == R.id.action_settings) {
-			Log.i(TAG, "action_settings!");
-			Intent settingsActivity = new Intent(getBaseContext(),BlockcastPreferenceActivity.class);
-			startActivity(settingsActivity);
-		}else if (item.getItemId() == R.id.view_post){
-			Log.i(TAG, "view_posts selected");
-			Intent viewPostsActivity = new Intent(getBaseContext(),ListViewLoader.class);
-			startActivity(viewPostsActivity);
-		}
-		else if (item.getItemId() == R.id.post){
-			Log.i(TAG, "post selected");
-			Intent mainActivity = new Intent(getBaseContext(),MainActivity.class);
-			startActivity(mainActivity);
-		}
-
-		return true;
-	}
-
 
 }

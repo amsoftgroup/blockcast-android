@@ -17,6 +17,9 @@ import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.mime.HttpMultipartMode;
+import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
@@ -88,7 +91,8 @@ public class ListViewLoader extends BlockcastBaseActivity {
 	private TextView bt;
 	private Chronometer c;
 	private ImageView iv;
-	
+	private Button delButton;
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -100,10 +104,9 @@ public class ListViewLoader extends BlockcastBaseActivity {
 
 		final BlockcastGet bcg = new BlockcastGet();
 		bcg.execute();
-		
+
 		m_ProgressDialog = ProgressDialog.show(ListViewLoader.this, "Please wait...", "Retrieving data ...", true);
 		m_ProgressDialog.setCancelable(true);
-
 		m_ProgressDialog.setOnCancelListener(new OnCancelListener() {
 
 			@Override
@@ -112,7 +115,7 @@ public class ListViewLoader extends BlockcastBaseActivity {
 			}
 
 		});
-		
+
 		m_ProgressDialog.show();
 
 		new BlockcastGet().execute();
@@ -127,9 +130,11 @@ public class ListViewLoader extends BlockcastBaseActivity {
 				Log.i(TAG, "send.onClick");
 				Intent postIntent = new Intent(getBaseContext(),MainActivity.class);	
 				startActivity(postIntent);
+
+				finish();
 			}
 		});
-		
+
 		m_posts = new ArrayList<Post>();
 		this.m_adapter = new PostAdapter(this, R.layout.row, m_posts);
 		lv = (ListView)this.findViewById(android.R.id.list);  
@@ -152,7 +157,7 @@ public class ListViewLoader extends BlockcastBaseActivity {
 		runOnUiThread(returnRes);
 		Log.i(TAG + ".getPosts()", "finished runonUIThread");	
 	}
-	
+
 	private class BlockcastGet extends AsyncTask<String, Void, ArrayList<Post>> {
 
 		@Override
@@ -174,10 +179,12 @@ public class ListViewLoader extends BlockcastBaseActivity {
 				HttpHost target = new HttpHost(Utils.servername, Utils.port, Utils.protocol);
 				//HttpGet getRequest = new HttpGet(Utils.api + "getPosts");
 
-				HttpGet getRequest = new HttpGet(Utils.api + "getPostsByDistanceAndDuration/" + distance + "/" + mLocation.getLatitude() + "/" + mLocation.getLongitude()); 
+				//HttpGet getRequest = new HttpGet(Utils.api + "getPostsByDistanceAndDuration/" + distance + "/" + mLocation.getLatitude() + "/" + mLocation.getLongitude()); 
+				HttpGet getRequest = new HttpGet(Utils.api + "getPostsByDistanceAndDurationWithGuid/" + distance + "/" + mLocation.getLatitude() + "/" + mLocation.getLongitude() + "/" + guid); 
+
 				//Log.i(TAG, "Sending: " + Utils.api + "getPostsByDistanceAndDuration/" + distance + "/" + mLocation.getLatitude() + "/" + mLocation.getLongitude());
-		
-				
+
+
 				Log.i(TAG, "executing http get to " + getRequest.getURI().toString());
 
 				httpResponse = httpclient.execute(target, getRequest);
@@ -233,7 +240,7 @@ public class ListViewLoader extends BlockcastBaseActivity {
 								p.setParentId(((JSONObject)json.get(j)).getLong("parentId"));
 								//p.setSec_elapsed(((JSONObject)json.get(j)).getLong("sec_elapsed"));
 								p.setMedia_preview(((JSONObject)json.get(j)).getString("media_preview"));
-								
+
 								if ((p.getMedia_preview() != null) && (!p.getMedia_preview().equalsIgnoreCase("null"))){
 									InputStream in = new java.net.URL(Utils.protocol + "://" + Utils.servername + Utils.images + p.getMedia_preview()).openStream();
 									p.setImage(BitmapFactory.decodeStream(in));
@@ -269,10 +276,10 @@ public class ListViewLoader extends BlockcastBaseActivity {
 			super.onPostExecute(result);
 
 			Log.i(TAG, "onPostExecute entered result.size()="+result.size());
-			
+
 			m_posts = result;
 			m_adapter.clear();
-		
+
 			for(int i=0;i<m_posts.size();i++){
 				//Log.i(TAG, "onPostExecute adding " + m_posts.get(i).getContent());
 				m_adapter.add(m_posts.get(i));
@@ -319,31 +326,29 @@ public class ListViewLoader extends BlockcastBaseActivity {
 				v = vi.inflate(R.layout.row, null);
 			}
 			Post o = items.get(position);
-			
+
 			if (o != null) {
-				
 
-
-				  
 				long baseTime = SystemClock.elapsedRealtime();
 				//Log.i(TAG, " baseTime = " + baseTime);
 				long sec_elapsed = o.getSec_elapsed();
 				//Log.i(TAG, " sec_elapsed = " + sec_elapsed);
 				long sec_remaining = o.getDuration() - sec_elapsed;
 				//Log.i(TAG, " sec_remaining = " + sec_remaining);	
-				
-				
+
+
 				//long epoch = o.get
 				Date now = new Date();
 				long now_seconds = now.getTime();
 				//long then = o.=-o];
-				
+
 				tt = (TextView) v.findViewById(R.id.toptext);
 				//Log.e(TAG, "toptext: " + tt.getText());
 				bt = (TextView) v.findViewById(R.id.bottomtext);
 				//Log.e(TAG, "bottomtext: " + bt.getText());
 				c = (Chronometer) v.findViewById(R.id.chronometer);
 				iv = (ImageView) v.findViewById(R.id.icon);
+				delButton = (Button) v.findViewById(R.id.delete);
 
 				if (tt != null) {
 					tt.setText(o.getContent());                            
@@ -353,78 +358,99 @@ public class ListViewLoader extends BlockcastBaseActivity {
 					bt.setText(o.getDistance() + "m " + ( o.getDuration()) + "s");		  
 				}
 				if (c !=null){
-                    c.setBase(0);
-                    c.start();
+					c.setBase(0);
+					c.start();
 				}
 				if ((iv !=null) && (o.getImage() !=null)){
 					iv.setImageBitmap(o.getImage());
 				}else{
 					iv.setImageBitmap(null);
 				}
+				
+
+				if (o.getMine() == 1){
+					MyOnClickListener ocl = new MyOnClickListener("" + o.getId());
+					delButton.setText("delete");
+					delButton.setOnClickListener(ocl);
+				}else{
+					//delButton.setVisibility(View.GONE);
+				}
 			}
 			return v;
 		}
 	}
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.main, menu);
-		return true;
-	}
 
-	/* we need an options menu, not nav bar */
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		super.onOptionsItemSelected(item);
-		
-		// Handle item selection
-		Log.i(TAG, "item.getItemId():" + item.getItemId());
-		Log.i(TAG, "R.string.settings:" +R.string.settings);
-		Log.i(TAG, "R.id.action_settings:" +R.string.settings);
-		Log.i(TAG, "R.id.post:" +R.string.settings);
-		
-		if (item.getItemId() == R.id.action_settings)  {
+	private class DeletePostTask extends AsyncTask<String, Void, HttpResponse> {
+		@Override
+		protected HttpResponse doInBackground(String... params) {
 
-			Log.i(TAG, "action_settings!");
-			Intent settingsActivity = new Intent(getBaseContext(),BlockcastPreferenceActivity.class);	
-			startActivity(settingsActivity);
-	
-		}else if (item.getItemId() == R.id.view_post){
-	
-			Log.i(TAG, "view_posts selected");
-			Intent viewPostsActivity = new Intent(getBaseContext(),ListViewLoader.class);
-			startActivity(viewPostsActivity);
-			
-		}else if (item.getItemId() ==R.id.post){
-	
-			Log.i(TAG, "post selected");
-			Intent mainActivity = new Intent(getBaseContext(),MainActivity.class);
-			startActivity(mainActivity);
-			
+			String target = params[0];
+			String guid = params[1];
+			String commentid = params[2];
+
+			Log.i(TAG, "GUID:"+guid);
+
+			MultipartEntityBuilder builder = MultipartEntityBuilder.create();     
+			//builder.setBoundary("+++BOUNDARY+++");
+			builder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
+			builder.addTextBody("commentid", commentid);
+			builder.addTextBody("guid", guid);
+
+			HttpPost httpPost = new HttpPost(target);
+			httpPost.setEntity(builder.build());
+
+			Log.i(TAG, httpPost.getEntity().toString());
+			Log.i(TAG, httpPost.getEntity().getContentType().getName() + "***" + httpPost.getEntity().getContentType().getValue());
+
+			java.io.ByteArrayOutputStream out = new java.io.ByteArrayOutputStream((int)httpPost.getEntity().getContentLength());
+
+			try {
+				httpPost.getEntity().writeTo(out);
+			} catch (IOException e1) {
+				Log.e(TAG, "IOException:" + e1.toString());
+			}
+			//			byte[] entityContentAsBytes = out.toByteArray();
+			// or convert to string
+			String entityContentAsString = new String(out.toByteArray());
+
+			Log.i(TAG, "entityContentAsString:" + entityContentAsString);
+
+			AndroidHttpClient client = AndroidHttpClient.newInstance("Android");
+			HttpResponse response = null;
+
+			try {
+				response = client.execute(httpPost);			
+			} catch (IOException e) {
+				Log.e(TAG, e.toString());
+			} finally {
+				client.close();
+			}
+			return response;
 		}
-		
-		return true;
 	}
-	//@Override
-	//public void asyncComplete(boolean success) {
-	//	m_adapter.notifyDataSetChanged();
-	//}
-	public class MyCountDownTimer extends CountDownTimer {
-		  public MyCountDownTimer(long startTime, long interval) {
-			  super(startTime, interval);
-		  }
-		 
-		  @Override
-		  public void onFinish() {
-			  //text.setText("Time's up!");
-		  }
-		 
-		  @Override
-		  public void onTick(long millisUntilFinished) {
-			 // text.setText("" + millisUntilFinished / 1000);
-		  }
+
+	private class MyOnClickListener implements OnClickListener{
+
+		String postid = "";
+
+		public MyOnClickListener(String postid) {
+			this.postid = postid;
+		}
+
+		@Override
+		public void onClick(View v)
+		{
+			Log.e(TAG, "CLICKED o.getMine():"+postid);
+			if (v.getId() == R.id.delete){
+
+				delButton = (Button) v.findViewById(R.id.delete);
+
+				String reqstring = Utils.protocol + "://" + Utils.servername + Utils.api + "deletePost/" ;
+				Log.i(TAG, "reqstring:" + reqstring);
+				Log.i(TAG, "GUID:" + guid);
+
+				new DeletePostTask().execute(reqstring, guid, postid);
+			}
+		}
 	}
-	
 }
-
-
