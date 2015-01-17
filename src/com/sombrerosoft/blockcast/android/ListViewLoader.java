@@ -281,7 +281,7 @@ public class ListViewLoader extends BlockcastBaseActivity {
 			m_adapter.clear();
 
 			for(int i=0;i<m_posts.size();i++){
-				//Log.i(TAG, "onPostExecute adding " + m_posts.get(i).getContent());
+				Log.i(TAG, "onPostExecute adding " + m_posts.get(i).getContent());
 				m_adapter.add(m_posts.get(i));
 			}
 
@@ -321,10 +321,12 @@ public class ListViewLoader extends BlockcastBaseActivity {
 		public View getView(int position, View convertView, ViewGroup parent) {
 
 			View v = convertView;
+			
 			if (v == null) {
 				LayoutInflater vi = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 				v = vi.inflate(R.layout.row, null);
 			}
+			
 			Post o = items.get(position);
 
 			if (o != null) {
@@ -351,9 +353,11 @@ public class ListViewLoader extends BlockcastBaseActivity {
 				delButton = (Button) v.findViewById(R.id.delete);
 
 				if (tt != null) {
+					Log.e(TAG, "tt != null");
 					tt.setText(o.getContent());                            
 				}
 				if(bt != null){
+					Log.e(TAG, "bt != null");
 					//Date expiry = new Date(Long.parseLong("" + o.getEpoch() * 1000l));
 					bt.setText(o.getDistance() + "m " + ( o.getDuration()) + "s");		  
 				}
@@ -366,14 +370,16 @@ public class ListViewLoader extends BlockcastBaseActivity {
 				}else{
 					iv.setImageBitmap(null);
 				}
-				
 
+
+				Log.e(TAG, "o.getMine()=" + o.getMine());
+				MyOnClickListener ocl = new MyOnClickListener("" + o.getId());
+				delButton.setText("delete");
+				delButton.setOnClickListener(ocl);
 				if (o.getMine() == 1){
-					MyOnClickListener ocl = new MyOnClickListener("" + o.getId());
-					delButton.setText("delete");
-					delButton.setOnClickListener(ocl);
+					delButton.setVisibility(0);
 				}else{
-					//delButton.setVisibility(View.GONE);
+					delButton.setVisibility(2);
 				}
 			}
 			return v;
@@ -387,8 +393,6 @@ public class ListViewLoader extends BlockcastBaseActivity {
 			String target = params[0];
 			String guid = params[1];
 			String commentid = params[2];
-
-			Log.i(TAG, "GUID:"+guid);
 
 			MultipartEntityBuilder builder = MultipartEntityBuilder.create();     
 			//builder.setBoundary("+++BOUNDARY+++");
@@ -409,8 +413,8 @@ public class ListViewLoader extends BlockcastBaseActivity {
 			} catch (IOException e1) {
 				Log.e(TAG, "IOException:" + e1.toString());
 			}
-			//			byte[] entityContentAsBytes = out.toByteArray();
-			// or convert to string
+			
+			//byte[] entityContentAsBytes = out.toByteArray();, or convert to string
 			String entityContentAsString = new String(out.toByteArray());
 
 			Log.i(TAG, "entityContentAsString:" + entityContentAsString);
@@ -425,6 +429,7 @@ public class ListViewLoader extends BlockcastBaseActivity {
 			} finally {
 				client.close();
 			}
+			
 			return response;
 		}
 	}
@@ -440,16 +445,20 @@ public class ListViewLoader extends BlockcastBaseActivity {
 		@Override
 		public void onClick(View v)
 		{
-			Log.e(TAG, "CLICKED o.getMine():"+postid);
+			Log.e(TAG, "CLICKED o.getMine(): postid="+postid + " guid=" + guid);
 			if (v.getId() == R.id.delete){
 
 				delButton = (Button) v.findViewById(R.id.delete);
 
 				String reqstring = Utils.protocol + "://" + Utils.servername + Utils.api + "deletePost/" ;
 				Log.i(TAG, "reqstring:" + reqstring);
-				Log.i(TAG, "GUID:" + guid);
-
+		        
 				new DeletePostTask().execute(reqstring, guid, postid);
+
+				Intent refresh = new Intent(getBaseContext(),ListViewLoader.class);	
+				startActivity(refresh);
+
+				finish();
 			}
 		}
 	}

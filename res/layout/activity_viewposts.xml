@@ -30,15 +30,27 @@
             android:id="@+id/button_upload"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/UPLOAD" />
+            android:text="@string/UPLOAD"
+         	android:textColor="#FFFFFF"
+			android:textSize="15sp"
+			android:background="@drawable/buttonshape"
+			android:shadowColor="#A8A8A8"
+			android:shadowDx="0"
+			android:shadowDy="0"
+			android:shadowRadius="5"  />
          
         <Button
             android:id="@+id/button_post"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/POST" />
-
-                
+            android:text="@string/POST" 
+            android:textColor="#FFFFFF"
+			android:textSize="15sp"
+			android:background="@drawable/buttonshape"
+			android:shadowColor="#A8A8A8"
+			android:shadowDx="0"
+			android:shadowDy="0"
+			android:shadowRadius="5"  />                
     </LinearLayout>
  
 </LinearLayout>

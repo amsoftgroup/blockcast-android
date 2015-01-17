@@ -54,34 +54,35 @@ public class BlockcastBaseActivity extends Activity implements ActivityLifecycle
 		
         guid = Installation.id(getBaseContext());
         df.setTimeZone(TimeZone.getTimeZone("GMT"));  
-        mLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        locationListener = new MyLocationListener();    	
+ 	
 
     }
 	
 	@Override
     protected void onStart() {
         super.onStart();
+        mLocationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        locationListener = new MyLocationListener();   
     }
 
 	@Override
     protected void onResume() {
         super.onResume();
         
-        is_connected = Utils.isNetworkAvailable(this);
-        
-        if (!is_connected){
-			Toast toast = Toast.makeText(getApplicationContext(), "Not Connected to the Internet!", Toast.LENGTH_SHORT);
-			toast.show();
-        }else{
-			Toast toast = Toast.makeText(getApplicationContext(), "Connected to the Internet!", Toast.LENGTH_SHORT);
-			toast.show();
-        }
-        
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
         debug = prefs.getString("DEBUG", "0");
         distance = Long.parseLong(prefs.getString("DISTANCE", "100"));
 	    duration = Long.parseLong(prefs.getString("DURATION", "3600"));
+	    
+        is_connected = Utils.isNetworkAvailable(this);
+        
+        if (!is_connected && debug.equals("1")){
+			Toast toast = Toast.makeText(getApplicationContext(), "Not Connected to the Internet!", Toast.LENGTH_SHORT);
+			toast.show();
+        }else if (debug.equals("1")){
+			Toast toast = Toast.makeText(getApplicationContext(), "Connected to the Internet!", Toast.LENGTH_SHORT);
+			toast.show();
+        }
 	    
 		try{
 			network_enabled = mLocationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
@@ -112,12 +113,13 @@ public class BlockcastBaseActivity extends Activity implements ActivityLifecycle
 	@Override
     protected void onPause() {
         super.onPause();
-        mLocationManager.removeUpdates(locationListener);
+       
     }
 
 	@Override
     protected void onStop() {
         super.onStop();  
+        mLocationManager.removeUpdates(locationListener);
     }
     
     protected class MyLocationListener implements LocationListener {
