@@ -245,6 +245,7 @@ public class ListViewLoader extends BlockcastBaseActivity {
 									InputStream in = new java.net.URL(Utils.protocol + "://" + Utils.servername + Utils.images + p.getMedia_preview()).openStream();
 									p.setImage(BitmapFactory.decodeStream(in));
 								} 
+								p.setMine(((JSONObject)json.get(j)).getInt("mine"));
 								//p.setMediaFile(((JSONObject)json.get(j)).<File>("mediafile"));
 								posts.add(p);
 							} catch (JSONException e) {
@@ -353,11 +354,11 @@ public class ListViewLoader extends BlockcastBaseActivity {
 				delButton = (Button) v.findViewById(R.id.delete);
 
 				if (tt != null) {
-					Log.e(TAG, "tt != null");
+					//Log.e(TAG, "tt != null");
 					tt.setText(o.getContent());                            
 				}
 				if(bt != null){
-					Log.e(TAG, "bt != null");
+					//Log.e(TAG, "bt != null");
 					//Date expiry = new Date(Long.parseLong("" + o.getEpoch() * 1000l));
 					bt.setText(o.getDistance() + "m " + ( o.getDuration()) + "s");		  
 				}
@@ -370,17 +371,31 @@ public class ListViewLoader extends BlockcastBaseActivity {
 				}else{
 					iv.setImageBitmap(null);
 				}
+				if (delButton !=null){
+					delButton.setText("delete");
+					MyOnClickListener ocl = new MyOnClickListener("" + o.getId());					
+					delButton.setOnClickListener(ocl);
+					
+					if (o.getMine() == 1){
+						delButton.setVisibility(android.view.View.VISIBLE);
+					}else{
+						delButton.setVisibility(android.view.View.GONE);
+					}
+					
+		
+				}
 
-
+				/*
 				Log.e(TAG, "o.getMine()=" + o.getMine());
 				MyOnClickListener ocl = new MyOnClickListener("" + o.getId());
-				delButton.setText("delete");
+				
 				delButton.setOnClickListener(ocl);
 				if (o.getMine() == 1){
 					delButton.setVisibility(0);
 				}else{
 					delButton.setVisibility(2);
 				}
+				*/
 			}
 			return v;
 		}
