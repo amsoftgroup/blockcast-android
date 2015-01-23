@@ -178,8 +178,11 @@ public class ListViewLoader extends BlockcastBaseActivity {
 
 				HttpHost target = new HttpHost(Utils.servername, Utils.port, Utils.protocol);
 				//HttpGet getRequest = new HttpGet(Utils.api + "getPosts");
-
-				//HttpGet getRequest = new HttpGet(Utils.api + "getPostsByDistanceAndDuration/" + distance + "/" + mLocation.getLatitude() + "/" + mLocation.getLongitude()); 
+				
+				if (mLocation == null){
+					Log.e(TAG, "mLocation IS NULL");
+				}
+				//HttpGet getRequest = new HttpGet(Utils.api + "getPosts"); 
 				HttpGet getRequest = new HttpGet(Utils.api + "getPostsByDistanceAndDurationWithGuid/" + distance + "/" + mLocation.getLatitude() + "/" + mLocation.getLongitude() + "/" + guid); 
 
 				//Log.i(TAG, "Sending: " + Utils.api + "getPostsByDistanceAndDuration/" + distance + "/" + mLocation.getLatitude() + "/" + mLocation.getLongitude());
